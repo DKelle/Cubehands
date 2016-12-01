@@ -6,6 +6,7 @@
 #include "render_pass.h"
 #include "config.h"
 #include "gui.h"
+#include "Sample.cpp"
 
 #include <algorithm>
 #include <fstream>
@@ -106,6 +107,21 @@ int main(int argc, char* argv[])
 		std::cerr << "Usage: " << argv[0] << " <PMD file>" << std::endl;
 		return -1;
 	}
+
+    //start the leap motion 
+    SampleListener listener;
+    Controller controller;
+
+    // Have the sample listener receive events from the controller
+    controller.addListener(listener);
+
+    // Keep this process running until Enter is pressed
+    std::cout << "Press Enter to quit..." << std::endl;
+    std::cin.get();
+
+    // Remove the sample listener when done
+    controller.removeListener(listener);
+
 	GLFWwindow *window = init_glefw();
 	GUI gui(window);
 

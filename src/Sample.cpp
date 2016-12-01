@@ -215,6 +215,7 @@ void SampleListener::onServiceDisconnect(const Controller& controller) {
   std::cout << "Service Disconnected" << std::endl;
 }
 
+/*
 int main(int argc, char** argv) {
   // Create a sample listener and controller
   SampleListener listener;
@@ -234,4 +235,4 @@ int main(int argc, char** argv) {
   controller.removeListener(listener);
 
   return 0;
-}
+}*/

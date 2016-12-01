@@ -1,0 +1,468 @@
+Performing C SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ed912/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_ed912.dir/build.make CMakeFiles/cmTC_ed912.dir/build
+Building C object CMakeFiles/cmTC_ed912.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DOpenMP_FLAG_DETECTED -fopenmp=libomp   -o CMakeFiles/cmTC_ed912.dir/src.c.o   -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c"
+clang: warning: argument unused during compilation: '-fopenmp=libomp'
+/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_ed912.dir/src.c.o] Error 1
+make: *** [cmTC_ed912/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_cc72f/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_cc72f.dir/build.make CMakeFiles/cmTC_cc72f.dir/build
+Building C object CMakeFiles/cmTC_cc72f.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DOpenMP_FLAG_DETECTED   -o CMakeFiles/cmTC_cc72f.dir/src.c.o   -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c"
+/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_cc72f.dir/src.c.o] Error 1
+make: *** [cmTC_cc72f/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_82abd/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_82abd.dir/build.make CMakeFiles/cmTC_82abd.dir/build
+Building C object CMakeFiles/cmTC_82abd.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DOpenMP_FLAG_DETECTED -fopenmp   -o CMakeFiles/cmTC_82abd.dir/src.c.o   -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c"
+/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_82abd.dir/src.c.o] Error 1
+make: *** [cmTC_82abd/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_88203/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_88203.dir/build.make CMakeFiles/cmTC_88203.dir/build
+Building C object CMakeFiles/cmTC_88203.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DOpenMP_FLAG_DETECTED /openmp   -o CMakeFiles/cmTC_88203.dir/src.c.o   -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c"
+clang: error: no such file or directory: '/openmp'
+make[1]: *** [CMakeFiles/cmTC_88203.dir/src.c.o] Error 1
+make: *** [cmTC_88203/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_201d2/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_201d2.dir/build.make CMakeFiles/cmTC_201d2.dir/build
+Building C object CMakeFiles/cmTC_201d2.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DOpenMP_FLAG_DETECTED -Qopenmp   -o CMakeFiles/cmTC_201d2.dir/src.c.o   -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c"
+clang: error: unknown argument: '-Qopenmp'
+make[1]: *** [CMakeFiles/cmTC_201d2.dir/src.c.o] Error 1
+make: *** [cmTC_201d2/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_0318c/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_0318c.dir/build.make CMakeFiles/cmTC_0318c.dir/build
+Building C object CMakeFiles/cmTC_0318c.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DOpenMP_FLAG_DETECTED -openmp   -o CMakeFiles/cmTC_0318c.dir/src.c.o   -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c"
+/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_0318c.dir/src.c.o] Error 1
+make: *** [cmTC_0318c/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4a6dd/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_4a6dd.dir/build.make CMakeFiles/cmTC_4a6dd.dir/build
+Building C object CMakeFiles/cmTC_4a6dd.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DOpenMP_FLAG_DETECTED -xopenmp   -o CMakeFiles/cmTC_4a6dd.dir/src.c.o   -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c"
+clang: error: language not recognized: 'openmp'
+clang: warning: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c: 'linker' input unused
+make[1]: *** [CMakeFiles/cmTC_4a6dd.dir/src.c.o] Error 1
+make: *** [cmTC_4a6dd/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_55004/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_55004.dir/build.make CMakeFiles/cmTC_55004.dir/build
+Building C object CMakeFiles/cmTC_55004.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DOpenMP_FLAG_DETECTED +Oopenmp   -o CMakeFiles/cmTC_55004.dir/src.c.o   -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c"
+clang: error: no such file or directory: '+Oopenmp'
+make[1]: *** [CMakeFiles/cmTC_55004.dir/src.c.o] Error 1
+make: *** [cmTC_55004/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_26058/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_26058.dir/build.make CMakeFiles/cmTC_26058.dir/build
+Building C object CMakeFiles/cmTC_26058.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DOpenMP_FLAG_DETECTED -qsmp   -o CMakeFiles/cmTC_26058.dir/src.c.o   -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c"
+clang: error: unknown argument: '-qsmp'
+make[1]: *** [CMakeFiles/cmTC_26058.dir/src.c.o] Error 1
+make: *** [cmTC_26058/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_53c88/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_53c88.dir/build.make CMakeFiles/cmTC_53c88.dir/build
+Building C object CMakeFiles/cmTC_53c88.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DOpenMP_FLAG_DETECTED -mp   -o CMakeFiles/cmTC_53c88.dir/src.c.o   -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.c"
+clang: error: unknown argument: '-mp'
+make[1]: *** [CMakeFiles/cmTC_53c88.dir/src.c.o] Error 1
+make: *** [cmTC_53c88/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C++ SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2a851/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_2a851.dir/build.make CMakeFiles/cmTC_2a851.dir/build
+Building CXX object CMakeFiles/cmTC_2a851.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++     --std=c++11 -g -DGLM_FORCE_SIZE_FUNC=1 -DGLM_FORCE_RADIANS=1 -DOpenMP_FLAG_DETECTED -fopenmp=libomp   -o CMakeFiles/cmTC_2a851.dir/src.cxx.o -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx"
+clang: warning: argument unused during compilation: '-fopenmp=libomp'
+/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_2a851.dir/src.cxx.o] Error 1
+make: *** [cmTC_2a851/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C++ SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_0ee65/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_0ee65.dir/build.make CMakeFiles/cmTC_0ee65.dir/build
+Building CXX object CMakeFiles/cmTC_0ee65.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++     --std=c++11 -g -DGLM_FORCE_SIZE_FUNC=1 -DGLM_FORCE_RADIANS=1 -DOpenMP_FLAG_DETECTED   -o CMakeFiles/cmTC_0ee65.dir/src.cxx.o -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx"
+/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_0ee65.dir/src.cxx.o] Error 1
+make: *** [cmTC_0ee65/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C++ SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4dd05/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_4dd05.dir/build.make CMakeFiles/cmTC_4dd05.dir/build
+Building CXX object CMakeFiles/cmTC_4dd05.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++     --std=c++11 -g -DGLM_FORCE_SIZE_FUNC=1 -DGLM_FORCE_RADIANS=1 -DOpenMP_FLAG_DETECTED -fopenmp   -o CMakeFiles/cmTC_4dd05.dir/src.cxx.o -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx"
+/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_4dd05.dir/src.cxx.o] Error 1
+make: *** [cmTC_4dd05/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C++ SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2d151/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_2d151.dir/build.make CMakeFiles/cmTC_2d151.dir/build
+Building CXX object CMakeFiles/cmTC_2d151.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++     --std=c++11 -g -DGLM_FORCE_SIZE_FUNC=1 -DGLM_FORCE_RADIANS=1 -DOpenMP_FLAG_DETECTED /openmp   -o CMakeFiles/cmTC_2d151.dir/src.cxx.o -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx"
+clang: error: no such file or directory: '/openmp'
+make[1]: *** [CMakeFiles/cmTC_2d151.dir/src.cxx.o] Error 1
+make: *** [cmTC_2d151/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C++ SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_236db/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_236db.dir/build.make CMakeFiles/cmTC_236db.dir/build
+Building CXX object CMakeFiles/cmTC_236db.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++     --std=c++11 -g -DGLM_FORCE_SIZE_FUNC=1 -DGLM_FORCE_RADIANS=1 -DOpenMP_FLAG_DETECTED -Qopenmp   -o CMakeFiles/cmTC_236db.dir/src.cxx.o -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx"
+clang: error: unknown argument: '-Qopenmp'
+make[1]: *** [CMakeFiles/cmTC_236db.dir/src.cxx.o] Error 1
+make: *** [cmTC_236db/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C++ SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1c959/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_1c959.dir/build.make CMakeFiles/cmTC_1c959.dir/build
+Building CXX object CMakeFiles/cmTC_1c959.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++     --std=c++11 -g -DGLM_FORCE_SIZE_FUNC=1 -DGLM_FORCE_RADIANS=1 -DOpenMP_FLAG_DETECTED -openmp   -o CMakeFiles/cmTC_1c959.dir/src.cxx.o -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx"
+/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_1c959.dir/src.cxx.o] Error 1
+make: *** [cmTC_1c959/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C++ SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_83e0b/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_83e0b.dir/build.make CMakeFiles/cmTC_83e0b.dir/build
+Building CXX object CMakeFiles/cmTC_83e0b.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++     --std=c++11 -g -DGLM_FORCE_SIZE_FUNC=1 -DGLM_FORCE_RADIANS=1 -DOpenMP_FLAG_DETECTED -xopenmp   -o CMakeFiles/cmTC_83e0b.dir/src.cxx.o -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx"
+clang: error: language not recognized: 'openmp'
+clang: warning: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx: 'linker' input unused
+make[1]: *** [CMakeFiles/cmTC_83e0b.dir/src.cxx.o] Error 1
+make: *** [cmTC_83e0b/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C++ SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_a4fb1/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_a4fb1.dir/build.make CMakeFiles/cmTC_a4fb1.dir/build
+Building CXX object CMakeFiles/cmTC_a4fb1.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++     --std=c++11 -g -DGLM_FORCE_SIZE_FUNC=1 -DGLM_FORCE_RADIANS=1 -DOpenMP_FLAG_DETECTED +Oopenmp   -o CMakeFiles/cmTC_a4fb1.dir/src.cxx.o -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx"
+clang: error: no such file or directory: '+Oopenmp'
+make[1]: *** [CMakeFiles/cmTC_a4fb1.dir/src.cxx.o] Error 1
+make: *** [cmTC_a4fb1/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C++ SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_eb877/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_eb877.dir/build.make CMakeFiles/cmTC_eb877.dir/build
+Building CXX object CMakeFiles/cmTC_eb877.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++     --std=c++11 -g -DGLM_FORCE_SIZE_FUNC=1 -DGLM_FORCE_RADIANS=1 -DOpenMP_FLAG_DETECTED -qsmp   -o CMakeFiles/cmTC_eb877.dir/src.cxx.o -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx"
+clang: error: unknown argument: '-qsmp'
+make[1]: *** [CMakeFiles/cmTC_eb877.dir/src.cxx.o] Error 1
+make: *** [cmTC_eb877/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
+Performing C++ SOURCE FILE Test OpenMP_FLAG_DETECTED failed with the following output:
+Change Dir: /Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c37d1/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_c37d1.dir/build.make CMakeFiles/cmTC_c37d1.dir/build
+Building CXX object CMakeFiles/cmTC_c37d1.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++     --std=c++11 -g -DGLM_FORCE_SIZE_FUNC=1 -DGLM_FORCE_RADIANS=1 -DOpenMP_FLAG_DETECTED -mp   -o CMakeFiles/cmTC_c37d1.dir/src.cxx.o -c "/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/CMakeTmp/src.cxx"
+clang: error: unknown argument: '-mp'
+make[1]: *** [CMakeFiles/cmTC_c37d1.dir/src.cxx.o] Error 1
+make: *** [cmTC_c37d1/fast] Error 2
+
+Source file was:
+
+#include <omp.h>
+int main() {
+#ifdef _OPENMP
+  return 0;
+#else
+  breaks_on_purpose
+#endif
+}
+
