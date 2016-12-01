@@ -8,11 +8,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-#include <glm/gtx/component_wise.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <glm/gtx/io.hpp>
-#include <debuggl.h>
+namespace {
+	// Intersect a cylinder with radius 1/2, height 1, with base centered at
+	// (0, 0, 0) and up direction (0, 1, 0).
+	bool IntersectCylinder(const glm::vec3& origin, const glm::vec3& direction,
+			float radius, float height, float* t)
+	{
+		//FIXME perform proper ray-cylinder collision detection
+		return true;
+	}
+}
 
 GUI::GUI(GLFWwindow* window)
 	:window_(window)
@@ -45,9 +50,6 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 	}
 	if (key == GLFW_KEY_J && action == GLFW_RELEASE) {
 		//FIXME save out a screenshot using SaveJPEG
-		unsigned char*  data = new unsigned char[window_width_ * window_height_ * 3];
-		glReadPixels(0,0,window_width_,window_height_,GL_RGB,GL_UNSIGNED_BYTE,data);
-		SaveJPEG("../anime_girl_screenshot.jpg", window_width_,window_height_,data);
 	}
 
 	if (captureWASDUPDOWN(key, action))
@@ -58,30 +60,7 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 			roll_speed = -roll_speed_;
 		else
 			roll_speed = roll_speed_;
-		if(current_bone_ != -1)
-		{
-
-			// FIXME: actually roll the bone here
-
-			Bone* b = mesh_->skeleton.bones[current_bone_];
-			b->A = b->A * glm::inverse(b->S);
-			int jid_to = b->to_joint;
-	
-			Joint* to = mesh_->skeleton.joints[jid_to];
-
-			glm::vec3 t_offset = to->offset;
-			glm::vec3 tangent =  glm::vec3(b->S[2][0], b->S[2][1], b->S[2][2]);
-			b->S = glm::rotate(roll_speed, tangent) * b->S;
-			b->A = b->A * b->S;
-
-			mesh_->recompose_matrices(b);
-			//now that we have the offset delta, recursively apply it to all of our children
-			
-			//now that we have preformed the rotation, reclaculate the skelle
-			mesh_->skeleton.dirty = true;
-			pose_changed_= true;
-			return ;
-		}
+		// FIXME: actually roll the bone here
 	} else if (key == GLFW_KEY_C && action != GLFW_RELEASE) {
 		fps_mode_ = !fps_mode_;
 	} else if (key == GLFW_KEY_LEFT_BRACKET && action == GLFW_RELEASE) {
@@ -94,8 +73,6 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		current_bone_ %= mesh_->getNumberOfBones();
 	} else if (key == GLFW_KEY_T && action != GLFW_RELEASE) {
 		transparent_ = !transparent_;
-	}else if (key == GLFW_KEY_M && action != GLFW_RELEASE) {
-		fps_mode_ = !fps_mode_;	
 	}
 }
 
@@ -105,7 +82,6 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 	last_y_ = current_y_;
 	current_x_ = mouse_x;
 	current_y_ = window_height_ - mouse_y;
-	mouse_pos = glm::vec2(current_x_, current_y_);
 	float delta_x = current_x_ - last_x_;
 	float delta_y = current_y_ - last_y_;
 	if (sqrt(delta_x * delta_x + delta_y * delta_y) < 1e-15)
@@ -115,15 +91,10 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 	glm::vec2 mouse_end = glm::vec2(current_x_, current_y_);
 	glm::uvec4 viewport = glm::uvec4(0, 0, window_width_, window_height_);
 
-
-	glm::vec3 near = glm::unProject(glm::vec3(mouse_pos.x, mouse_pos.y,0), view_matrix_,projection_matrix_, viewport);
-	glm::vec3 far = glm::unProject(glm::vec3(mouse_pos.x, mouse_pos.y,1), view_matrix_,projection_matrix_, viewport);
-	mouse_dir = glm::normalize(far-near);
-
 	bool drag_camera = drag_state_ && current_button_ == GLFW_MOUSE_BUTTON_RIGHT;
 	bool drag_bone = drag_state_ && current_button_ == GLFW_MOUSE_BUTTON_LEFT;
 
-	if (drag_camera || drag_bone && fps_mode_) {
+	if (drag_camera) {
 		glm::vec3 axis = glm::normalize(
 				orientation_ *
 				glm::vec3(mouse_direction.y, -mouse_direction.x, 0.0f)
@@ -135,54 +106,11 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 		look_ = glm::column(orientation_, 2);
 	} else if (drag_bone && current_bone_ != -1) {
 		// FIXME: Handle bone rotation
-		glm::vec3 delta_dir = glm::normalize(glm::vec3(delta_x, delta_y, 0));
-		glm::vec3 rot = glm::cross(look_, delta_dir); 
-	
-		Bone* b = mesh_->skeleton.bones[current_bone_];
-		b->A = b->A * glm::inverse(b->S);
-		b->S = glm::rotate(rotation_speed_, rot) * b->S;
-		b->A = b->A * b->S;
-
-		mesh_->recompose_matrices(b);
-		//now that we have the offset delta, recursively apply it to all of our children
-		
-		//now that we have preformed the rotation, reclaculate the skelle
-		mesh_->skeleton.dirty = true;
-		pose_changed_= true;
 		return ;
 	}
+
 	// FIXME: highlight bones that have been moused over
-
-	//printf("inside mouse calback\n");
-
-	float t;
-	float min_t = 100000;
 	current_bone_ = -1;
-	for(size_t i = 0; i < mesh_->skeleton.bones.size(); i++)
-	{
-		//printf("checking bone %d\n", i);
-		Bone *bone = mesh_->skeleton.bones[i];
-		
-		glm::vec4 transformed_dir = glm::inverse(bone->A) * glm::vec4(mouse_dir, 0);
-		glm::vec3 t_dir = glm::normalize(glm::vec3(transformed_dir));
-
-		// printf("About to use inverse matrix ");
-		// std::cout << glm::to_string(glm::inverse(bone->A)) << std::endl;
-
-		glm::vec4 transformed_center = glm::inverse(bone->A) * glm::vec4(eye_, 1);
-		glm::vec3 t_center = glm::vec3(transformed_center);
-
-		if(bone->IntersectCylinder(t_center, t_dir, .5f, bone->length, &t))
-		{
-			//printf("found an intersection with bone %d\n",i);
-			if (t < min_t)
-			{
-				min_t = t;
-				current_bone_ = i;
-				//printf("setting cur bone to %d\n", i);
-			}
-		}	
-	}
 }
 
 void GUI::mouseButtonCallback(int button, int action, int mods)

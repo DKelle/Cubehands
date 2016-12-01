@@ -4,7 +4,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-#include <vector>
 
 class Mesh;
 
@@ -34,15 +33,13 @@ public:
 	glm::vec3 getCenter() const { return center_; }
 	const glm::vec3& getCamera() const { return eye_; }
 	bool isPoseDirty() const { return pose_changed_; }
-	bool isFPS() const { return fps_mode_; }
 	void clearPose() { pose_changed_ = false; }
 	const float* getLightPositionPtr() const { return &light_position_[0]; }
 	
 	int getCurrentBone() const { return current_bone_; }
-	glm::vec3 getMouseDirection() const { return mouse_dir; }
 	bool setCurrentBone(int i);
+
 	bool isTransparent() const { return transparent_; }
-	glm::vec2 mouse_pos;
 private:
 	GLFWwindow* window_;
 	Mesh* mesh_;
@@ -69,7 +66,6 @@ private:
 	glm::vec3 tangent_ = glm::cross(look_, up_);
 	glm::vec3 center_ = eye_ - camera_distance_ * look_;
 	glm::mat3 orientation_ = glm::mat3(tangent_, up_, look_);
-	glm::vec3 mouse_dir;
 	glm::vec4 light_position_;
 
 	glm::mat4 view_matrix_ = glm::lookAt(eye_, center_, up_);

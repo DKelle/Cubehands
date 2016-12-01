@@ -23,36 +23,6 @@
 int window_width = 800, window_height = 600;
 const std::string window_title = "Skinning";
 
-const char* binormal_vertex_shader =
-#include "shaders/binormal.vert"
-;
-
-const char* binormal_fragment_shader =
-#include "shaders/binormal.frag"
-;
-const char* normal_vertex_shader =
-#include "shaders/normal.vert"
-;
-
-const char* normal_fragment_shader =
-#include "shaders/normal.frag"
-;
-const char* cylinder_vertex_shader =
-#include "shaders/cylinder.vert"
-;
-
-const char* cylinder_fragment_shader =
-#include "shaders/cylinder.frag"
-;
-
-const char* bone_vertex_shader =
-#include "shaders/bone.vert"
-;
-
-const char* bone_fragment_shader =
-#include "shaders/bone.frag"
-;
-
 const char* vertex_shader =
 #include "shaders/default.vert"
 ;
@@ -107,13 +77,23 @@ int main(int argc, char* argv[])
 		std::cerr << "Usage: " << argv[0] << " <PMD file>" << std::endl;
 		return -1;
 	}
+	GLFWwindow *window = init_glefw();
+	GUI gui(window);
 
-    //start the leap motion 
+	std::vector<glm::vec4> floor_vertices;
+	std::vector<glm::uvec3> floor_faces;
+	create_floor(floor_vertices, floor_faces);
+
+    //add our leap motion code
+    // Create a sample listener and controller
     SampleListener listener;
     Controller controller;
 
     // Have the sample listener receive events from the controller
     controller.addListener(listener);
+
+    if (argc > 1 && strcmp(argv[1], "--bg") == 0)
+      controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
 
     // Keep this process running until Enter is pressed
     std::cout << "Press Enter to quit..." << std::endl;
@@ -122,52 +102,11 @@ int main(int argc, char* argv[])
     // Remove the sample listener when done
     controller.removeListener(listener);
 
-	GLFWwindow *window = init_glefw();
-	GUI gui(window);
-
-	std::vector<glm::vec4> floor_vertices;
-	std::vector<glm::uvec3> floor_faces;
-	create_floor(floor_vertices, floor_faces);
-
-	// FIXME: add code to create bone and cylinder geometry
-
 	Mesh mesh;
 	mesh.loadpmd(argv[1]);
 	std::cout << "Loaded object  with  " << mesh.vertices.size()
 		<< " vertices and " << mesh.faces.size() << " faces.\n";
 
-	//Load the vectex and face vector for the skeleton
-	std::vector<glm::vec4> bone_vertices;
-	std::vector<glm::uvec2> bone_faces;
-	std::vector<int> bone_to_highlight;
-	create_bones(bone_vertices, bone_faces, &mesh);
-	mesh.numbones = bone_vertices.size();
-
-	//Create the cylinder that will be around the bones
-	std::vector<glm::vec4> cylinder_vertices;
-	std::vector<glm::uvec2> cylinder_faces;
-	create_cylinder(cylinder_vertices, cylinder_faces, 4, mesh.skeleton);
-
-	
-	//Create the normals that will be around the bones
-	std::vector<glm::vec4> normal_vertices;
-	std::vector<glm::uvec2> normal_faces;
-	create_normals(normal_vertices, normal_faces, 4, mesh.skeleton);
-
-	//Create the binormals that will be around the bones
-	std::vector<glm::vec4> binormal_vertices;
-	std::vector<glm::uvec2> binormal_faces;
-	create_binormals(binormal_vertices, binormal_faces, 4, mesh.skeleton);
-/*
-		glm::vec3 ray = gui.create_mouse_ray();
-		bone_vertices.clear();
-		bone_faces.clear();
-		bone_vertices.push_back(glm::vec4(0,8,0,1));
-		bone_vertices.push_back(glm::vec4(-.454507, -0.340879, -0.822936,1));
-		bone_faces.push_back(glm::uvec2(0,1));
-		mesh.numbones = bone_vertices.size();
-
-*/
 	glm::vec4 mesh_center = glm::vec4(0.0f);
 	for (size_t i = 0; i < mesh.vertices.size(); ++i) {
 		mesh_center += mesh.vertices[i];
@@ -267,50 +206,6 @@ int main(int argc, char* argv[])
 			);
 
 	// FIXME: Create the RenderPass objects for bones here.
-	RenderDataInput bone_pass_input;
-	bone_pass_input.assign(0, "vertex_position", bone_vertices.data(), bone_vertices.size(), 4, GL_FLOAT);
-	bone_pass_input.assign_index(bone_faces.data(), bone_faces.size(), 2);
-	RenderPass bone_pass(-1,
-			bone_pass_input,
-			{ bone_vertex_shader, nullptr, bone_fragment_shader},
-			{ std_model, std_view, std_proj},
-			{ "fragment_color" }
-			);
-
-
-	// Create Renderpass object for the normals 
-	RenderDataInput normal_pass_input;
-	normal_pass_input.assign(0, "vertex_position", normal_vertices.data(), normal_vertices.size(), 4, GL_FLOAT);
-	normal_pass_input.assign_index(normal_faces.data(), normal_faces.size(), 2);
-	RenderPass normal_pass(-1,
-			normal_pass_input,
-			{ normal_vertex_shader, nullptr, normal_fragment_shader},
-			{ std_model, std_view, std_proj},
-			{ "fragment_color" }
-			);
-
-	// Create Renderpass object for the binormals 
-	RenderDataInput binormal_pass_input;
-	binormal_pass_input.assign(0, "vertex_position", binormal_vertices.data(), binormal_vertices.size(), 4, GL_FLOAT);
-	binormal_pass_input.assign_index(binormal_faces.data(), binormal_faces.size(), 2);
-	RenderPass binormal_pass(-1,
-			binormal_pass_input,
-			{ binormal_vertex_shader, nullptr, binormal_fragment_shader},
-			{ std_model, std_view, std_proj},
-			{ "fragment_color" }
-			);
-
-	// Create Renderpass object for the cylinder
-	RenderDataInput cylinder_pass_input;
-	cylinder_pass_input.assign(0, "vertex_position", cylinder_vertices.data(), cylinder_vertices.size(), 4, GL_FLOAT);
-	cylinder_pass_input.assign_index(cylinder_faces.data(), cylinder_faces.size(), 2);
-	RenderPass cylinder_pass(-1,
-			cylinder_pass_input,
-			{ cylinder_vertex_shader, nullptr, cylinder_fragment_shader},
-			{ std_model, std_view, std_proj},
-			{ "fragment_color" }
-			);
-
 	//        Otherwise do whatever you like.
 
 	RenderDataInput floor_pass_input;
@@ -326,6 +221,7 @@ int main(int argc, char* argv[])
 	std::cout << "center = " << mesh.getCenter() << "\n";
 
 	bool draw_floor = true;
+	bool draw_skeleton = true;
 	bool draw_object = true;
 	bool draw_cylinder = true;
 
@@ -343,7 +239,6 @@ int main(int argc, char* argv[])
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glCullFace(GL_BACK);
 
-		//Draw a ray from camera to mouse
 		gui.updateMatrices();
 		mats = gui.getMatrixPointers();
 
@@ -353,38 +248,7 @@ int main(int argc, char* argv[])
 #else
 		draw_cylinder = true;
 #endif
-		//Draw the cylinder
-		if(draw_cylinder)	
-		{
-			cylinder_pass.setup();
-			CHECK_GL_ERROR(glDrawElements(GL_LINES, cylinder_faces.size()*2, GL_UNSIGNED_INT, 0));
-			create_cylinder(cylinder_vertices, cylinder_faces, current_bone, mesh.skeleton);
-			cylinder_pass.updateVBO(0, cylinder_vertices.data(), cylinder_vertices.size());	
-
-			normal_pass.setup();
-			CHECK_GL_ERROR(glDrawElements(GL_LINES, normal_faces.size()*2, GL_UNSIGNED_INT, 0));
-			create_normals(normal_vertices, normal_faces, current_bone, mesh.skeleton);
-			normal_pass.updateVBO(0, normal_vertices.data(), normal_vertices.size());	
-
-			binormal_pass.setup();
-			CHECK_GL_ERROR(glDrawElements(GL_LINES, binormal_faces.size()*2, GL_UNSIGNED_INT, 0));
-			create_binormals(binormal_vertices, binormal_faces, current_bone, mesh.skeleton);
-			binormal_pass.updateVBO(0, binormal_vertices.data(), binormal_vertices.size());	
-		}
 		// FIXME: Draw bones first.
-		if (gui.isTransparent())
-		{
-			bone_pass.setup();
-			CHECK_GL_ERROR(glDrawElements(GL_LINES, bone_faces.size() * 2, GL_UNSIGNED_INT, 0));
-
-			if(mesh.skeleton.dirty)
-			{
-//				mesh.createMatrices();
-				create_bones(bone_vertices, bone_faces, &mesh);
-				mesh.skeleton.dirty = false;
-				bone_pass.updateVBO(0, bone_vertices.data(), bone_vertices.size());	
-			}
-		}
 		// Then draw floor.
 		if (draw_floor) {
 			floor_pass.setup();
