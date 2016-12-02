@@ -1,13 +1,11 @@
 #include <GL/glew.h>
 #include <dirent.h>
 
-#include "bone_geometry.h"
-#include "procedure_geometry.h"
 #include "render_pass.h"
 #include "config.h"
 #include "gui.h"
 #include "menger.h"
-#include "Sample.cpp"
+#include "procedure_geometry.h"
 
 #include <algorithm>
 #include <fstream>
@@ -47,248 +45,184 @@ const char* cube_fragment_shader =
 // FIXME: Add more shaders here.
 
 void ErrorCallback(int error, const char* description) {
-	std::cerr << "GLFW Error: " << description << "\n";
+    std::cerr << "GLFW Error: " << description << "\n";
 }
 
 GLFWwindow* init_glefw()
 {
-	if (!glfwInit())
-		exit(EXIT_FAILURE);
-	glfwSetErrorCallback(ErrorCallback);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
-	auto ret = glfwCreateWindow(window_width, window_height, window_title.data(), nullptr, nullptr);
-	CHECK_SUCCESS(ret != nullptr);
-	glfwMakeContextCurrent(ret);
-	glewExperimental = GL_TRUE;
-	CHECK_SUCCESS(glewInit() == GLEW_OK);
-	glGetError();  // clear GLEW's error for it
-	glfwSwapInterval(1);
-	const GLubyte* renderer = glGetString(GL_RENDERER);  // get renderer string
-	const GLubyte* version = glGetString(GL_VERSION);    // version as a string
-	std::cout << "Renderer: " << renderer << "\n";
-	std::cout << "OpenGL version supported:" << version << "\n";
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+    glfwSetErrorCallback(ErrorCallback);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    auto ret = glfwCreateWindow(window_width, window_height, window_title.data(), nullptr, nullptr);
+    CHECK_SUCCESS(ret != nullptr);
+    glfwMakeContextCurrent(ret);
+    glewExperimental = GL_TRUE;
+    CHECK_SUCCESS(glewInit() == GLEW_OK);
+    glGetError();  // clear GLEW's error for it
+    glfwSwapInterval(1);
+    const GLubyte* renderer = glGetString(GL_RENDERER);  // get renderer string
+    const GLubyte* version = glGetString(GL_VERSION);    // version as a string
+    std::cout << "Renderer: " << renderer << "\n";
+    std::cout << "OpenGL version supported:" << version << "\n";
 
-	return ret;
+    return ret;
 }
 
 std::shared_ptr<Menger> g_menger;
 
 int main(int argc, char* argv[])
 {
-	if (argc < 2) {
-		std::cerr << "Input model file is missing" << std::endl;
-		std::cerr << "Usage: " << argv[0] << " <PMD file>" << std::endl;
-		return -1;
-	}
-	GLFWwindow *window = init_glefw();
-	GUI gui(window);
+    GLFWwindow *window = init_glefw();
+    GUI gui(window);
 
-	std::vector<glm::vec4> floor_vertices;
-	std::vector<glm::uvec3> floor_faces;
-	create_floor(floor_vertices, floor_faces);
+    std::vector<glm::vec4> floor_vertices;
+    std::vector<glm::uvec3> floor_faces;
+    create_floor(floor_vertices, floor_faces);
 
-    //add our leap motion code
-    // Create a sample listener and controller
-    SampleListener listener;
-    Controller controller;
 
-    // Have the sample listener receive events from the controller
-    controller.addListener(listener);
-    controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
 
+    glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
+    MatrixPointers mats; // Define MatrixPointers here for lambda to capture
     /*
-    // Keep this process running until Enter is pressed
-    std::cout << "Press Enter to quit..." << std::endl;
-    std::cin.get();
+     * In the following we are going to define several lambda functions to bind Uniforms.
+     * 
+     * Introduction about lambda functions:
+     *      http://en.cppreference.com/w/cpp/language/lambda
+     *      http://www.stroustrup.com/C++11FAQ.html#lambda
+     */
+    auto matrix_binder = [](int loc, const void* data) {
+        glUniformMatrix4fv(loc, 1, GL_FALSE, (const GLfloat*)data);
+    };
+    auto vector_binder = [](int loc, const void* data) {
+        glUniform4fv(loc, 1, (const GLfloat*)data);
+    };
+    auto vector3_binder = [](int loc, const void* data) {
+        glUniform3fv(loc, 1, (const GLfloat*)data);
+    };
+    auto float_binder = [](int loc, const void* data) {
+        glUniform1fv(loc, 1, (const GLfloat*)data);
+    };
+    /*
+     * These lambda functions below are used to retrieve data
+     */
+    auto std_model_data = [&mats]() -> const void* {
+        return mats.model;
+    }; // This returns point to model matrix
+    glm::mat4 floor_model_matrix = glm::mat4(1.0f);
+    auto floor_model_data = [&floor_model_matrix]() -> const void* {
+        return &floor_model_matrix[0][0];
+    }; // This return model matrix for the floor.
+    auto std_view_data = [&mats]() -> const void* {
+        return mats.view;
+    };
+    auto std_camera_data  = [&gui]() -> const void* {
+        return &gui.getCamera()[0];
+    };
+    auto std_proj_data = [&mats]() -> const void* {
+        return mats.projection;
+    };
+    auto std_light_data = [&light_position]() -> const void* {
+        return &light_position[0];
+    };
+    auto alpha_data  = [&gui]() -> const void* {
+        static const float transparet = 0.5; // Alpha constant goes here
+        static const float non_transparet = 1.0;
+        if (gui.isTransparent())
+            return &transparet;
+        else
+            return &non_transparet;
+    };
+    // FIXME: add more lambdas for data_source if you want to use RenderPass.
+    //        Otherwise, do whatever you like here
+    ShaderUniform std_model = { "model", matrix_binder, std_model_data };
+    ShaderUniform floor_model = { "model", matrix_binder, floor_model_data };
+    ShaderUniform std_view = { "view", matrix_binder, std_view_data };
+    ShaderUniform std_camera = { "camera_position", vector3_binder, std_camera_data };
+    ShaderUniform std_proj = { "projection", matrix_binder, std_proj_data };
+    ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
+    ShaderUniform object_alpha = { "alpha", float_binder, alpha_data };
+    // FIXME: define more ShaderUniforms for RenderPass if you want to use it.
+    //        Otherwise, do whatever you like here
 
-    // Remove the sample listener when done
-    controller.removeListener(listener);
-    */
 
-	Mesh mesh;
-	mesh.loadpmd(argv[1]);
-	std::cout << "Loaded object  with  " << mesh.vertices.size()
-		<< " vertices and " << mesh.faces.size() << " faces.\n";
+    RenderDataInput floor_pass_input;
+    floor_pass_input.assign(0, "vertex_position", floor_vertices.data(), floor_vertices.size(), 4, GL_FLOAT);
+    floor_pass_input.assign_index(floor_faces.data(), floor_faces.size(), 3);
+    RenderPass floor_pass(-1,
+            floor_pass_input,
+            { vertex_shader, geometry_shader, floor_fragment_shader},
+            { floor_model, std_view, std_proj, std_light },
+            { "fragment_color" }
+            );
+    float aspect = 0.0f;
 
-	glm::vec4 mesh_center = glm::vec4(0.0f);
-	for (size_t i = 0; i < mesh.vertices.size(); ++i) {
-		mesh_center += mesh.vertices[i];
-	}
-	mesh_center /= mesh.vertices.size();
+    std::vector<glm::vec4> cube_vertices;
+    std::vector<glm::vec4> vtx_normals;
+    std::vector<glm::uvec3> cube_faces;
+    g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, glm::vec3(0.0,5.0,0.0));
 
-	/*
-	 * GUI object needs the mesh object for bone manipulation.
-	 */
-	gui.assignMesh(&mesh);
+    RenderDataInput cube_pass_input;
+    cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
+    cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+    cube_pass_input.assign_index(cube_faces.data(), cube_faces.size(), 3);
+    RenderPass cube_pass(-1,
+            cube_pass_input,
+            { vertex_shader, geometry_shader, cube_fragment_shader},
+            { std_model, std_view, std_proj, std_light },
+            { "fragment_color" }
+            );
 
-	glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
-	MatrixPointers mats; // Define MatrixPointers here for lambda to capture
-	/*
-	 * In the following we are going to define several lambda functions to bind Uniforms.
-	 * 
-	 * Introduction about lambda functions:
-	 *      http://en.cppreference.com/w/cpp/language/lambda
-	 *      http://www.stroustrup.com/C++11FAQ.html#lambda
-	 */
-	auto matrix_binder = [](int loc, const void* data) {
-		glUniformMatrix4fv(loc, 1, GL_FALSE, (const GLfloat*)data);
-	};
-	auto bone_matrix_binder = [&mesh](int loc, const void* data) {
-		auto nelem = mesh.getNumberOfBones();
-		glUniformMatrix4fv(loc, nelem, GL_FALSE, (const GLfloat*)data);
-	};
-	auto vector_binder = [](int loc, const void* data) {
-		glUniform4fv(loc, 1, (const GLfloat*)data);
-	};
-	auto vector3_binder = [](int loc, const void* data) {
-		glUniform3fv(loc, 1, (const GLfloat*)data);
-	};
-	auto float_binder = [](int loc, const void* data) {
-		glUniform1fv(loc, 1, (const GLfloat*)data);
-	};
-	/*
-	 * These lambda functions below are used to retrieve data
-	 */
-	auto std_model_data = [&mats]() -> const void* {
-		return mats.model;
-	}; // This returns point to model matrix
-	glm::mat4 floor_model_matrix = glm::mat4(1.0f);
-	auto floor_model_data = [&floor_model_matrix]() -> const void* {
-		return &floor_model_matrix[0][0];
-	}; // This return model matrix for the floor.
-	auto std_view_data = [&mats]() -> const void* {
-		return mats.view;
-	};
-	auto std_camera_data  = [&gui]() -> const void* {
-		return &gui.getCamera()[0];
-	};
-	auto std_proj_data = [&mats]() -> const void* {
-		return mats.projection;
-	};
-	auto std_light_data = [&light_position]() -> const void* {
-		return &light_position[0];
-	};
-	auto alpha_data  = [&gui]() -> const void* {
-		static const float transparet = 0.5; // Alpha constant goes here
-		static const float non_transparet = 1.0;
-		if (gui.isTransparent())
-			return &transparet;
-		else
-			return &non_transparet;
-	};
-	// FIXME: add more lambdas for data_source if you want to use RenderPass.
-	//        Otherwise, do whatever you like here
-	ShaderUniform std_model = { "model", matrix_binder, std_model_data };
-	ShaderUniform floor_model = { "model", matrix_binder, floor_model_data };
-	ShaderUniform std_view = { "view", matrix_binder, std_view_data };
-	ShaderUniform std_camera = { "camera_position", vector3_binder, std_camera_data };
-	ShaderUniform std_proj = { "projection", matrix_binder, std_proj_data };
-	ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
-	ShaderUniform object_alpha = { "alpha", float_binder, alpha_data };
-	// FIXME: define more ShaderUniforms for RenderPass if you want to use it.
-	//        Otherwise, do whatever you like here
+    bool draw_floor = true;
+    bool draw_skeleton = true;
+    bool draw_object = true;
+    bool draw_cylinder = true;
 
-	std::vector<glm::vec2>& uv_coordinates = mesh.uv_coordinates;
-	RenderDataInput object_pass_input;
-	object_pass_input.assign(0, "vertex_position", nullptr, mesh.vertices.size(), 4, GL_FLOAT);
-	object_pass_input.assign(1, "normal", mesh.vertex_normals.data(), mesh.vertex_normals.size(), 4, GL_FLOAT);
-	object_pass_input.assign(2, "uv", uv_coordinates.data(), uv_coordinates.size(), 2, GL_FLOAT);
-	object_pass_input.assign_index(mesh.faces.data(), mesh.faces.size(), 3);
-	object_pass_input.useMaterials(mesh.materials);
-	RenderPass object_pass(-1,
-			object_pass_input,
-			{
-			  vertex_shader,
-			  geometry_shader,
-			  fragment_shader
-			},
-			{ std_model, std_view, std_proj,
-			  std_light,
-			  std_camera, object_alpha },
-			{ "fragment_color" }
-			);
+    while (!glfwWindowShouldClose(window)) {
+        // Setup some basic window stuff.
+        glfwGetFramebufferSize(window, &window_width, &window_height);
+        glViewport(0, 0, window_width, window_height);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_MULTISAMPLE);
+        glEnable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDepthFunc(GL_LESS);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glCullFace(GL_BACK);
 
-	// FIXME: Create the RenderPass objects for bones here.
-	//        Otherwise do whatever you like.
+        gui.updateMatrices();
+        mats = gui.getMatrixPointers();
 
-	RenderDataInput floor_pass_input;
-	floor_pass_input.assign(0, "vertex_position", floor_vertices.data(), floor_vertices.size(), 4, GL_FLOAT);
-	floor_pass_input.assign_index(floor_faces.data(), floor_faces.size(), 3);
-	RenderPass floor_pass(-1,
-			floor_pass_input,
-			{ vertex_shader, geometry_shader, floor_fragment_shader},
-			{ floor_model, std_view, std_proj, std_light },
-			{ "fragment_color" }
-			);
-	float aspect = 0.0f;
-	std::cout << "center = " << mesh.getCenter() << "\n";
-
-	std::vector<glm::vec4> cube_vertices;
-	std::vector<glm::vec4> vtx_normals;
-	std::vector<glm::uvec3> cube_faces;
-	g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, glm::vec3(0.0,5.0,0.0));
-
-	RenderDataInput cube_pass_input;
-	cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
-	cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
-	cube_pass_input.assign_index(cube_faces.data(), cube_faces.size(), 3);
-	RenderPass cube_pass(-1,
-			cube_pass_input,
-			{ vertex_shader, geometry_shader, cube_fragment_shader},
-			{ std_model, std_view, std_proj, std_light },
-			{ "fragment_color" }
-			);
-
-	bool draw_floor = true;
-	bool draw_skeleton = true;
-	bool draw_object = true;
-	bool draw_cylinder = true;
-
-	while (!glfwWindowShouldClose(window)) {
-		// Setup some basic window stuff.
-		glfwGetFramebufferSize(window, &window_width, &window_height);
-		glViewport(0, 0, window_width, window_height);
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_MULTISAMPLE);
-		glEnable(GL_BLEND);
-		glEnable(GL_CULL_FACE);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glDepthFunc(GL_LESS);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glCullFace(GL_BACK);
-
-		gui.updateMatrices();
-		mats = gui.getMatrixPointers();
-
-		int current_bone = gui.getCurrentBone();
+        int current_bone = gui.getCurrentBone();
 #if 1
-		draw_cylinder = (current_bone != -1 && gui.isTransparent());
+        draw_cylinder = (current_bone != -1 && gui.isTransparent());
 #else
-		draw_cylinder = true;
+        draw_cylinder = true;
 #endif
-		// FIXME: Draw bones first.
-		// Then draw floor.
-		if (draw_floor) {
-			floor_pass.setup();
-			// Draw our triangles.
-			CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, floor_faces.size() * 3, GL_UNSIGNED_INT, 0));
-		}
-		cube_pass.setup();
-		CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
-		// Poll and swap.
-		glfwPollEvents();
-		glfwSwapBuffers(window);
-	}
-	glfwDestroyWindow(window);
-	glfwTerminate();
+        // FIXME: Draw bones first.
+        // Then draw floor.
+        if (draw_floor) {
+            floor_pass.setup();
+            // Draw our triangles.
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, floor_faces.size() * 3, GL_UNSIGNED_INT, 0));
+        }
+        cube_pass.setup();
+        CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
+        // Poll and swap.
+        glfwPollEvents();
+        glfwSwapBuffers(window);
+    }
+    glfwDestroyWindow(window);
+    glfwTerminate();
 #if 0
-	for (size_t i = 0; i < images.size(); ++i)
-		delete [] images[i].bytes;
+    for (size_t i = 0; i < images.size(); ++i)
+        delete [] images[i].bytes;
 #endif
-	exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }

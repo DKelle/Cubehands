@@ -24,5 +24,5 @@ class SampleListener : public Listener {
 
   private:
     std::vector<glm::vec4> hand_positions;
-    bool print_leap_stats = true;
+    bool print_leap_stats = false;
 };

@@ -1,7 +1,6 @@
 #include "gui.h"
 #include "config.h"
 #include <jpegio.h>
-#include "bone_geometry.h"
 #include <iostream>
 #include <debuggl.h>
 #include <glm/gtc/matrix_access.hpp>
@@ -36,11 +35,6 @@ GUI::~GUI()
 {
 }
 
-void GUI::assignMesh(Mesh* mesh)
-{
-	mesh_ = mesh;
-	center_ = mesh_->getCenter();
-}
 
 void GUI::keyCallback(int key, int scancode, int action, int mods)
 {
@@ -63,16 +57,6 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		// FIXME: actually roll the bone here
 	} else if (key == GLFW_KEY_C && action != GLFW_RELEASE) {
 		fps_mode_ = !fps_mode_;
-	} else if (key == GLFW_KEY_LEFT_BRACKET && action == GLFW_RELEASE) {
-		current_bone_--;
-		current_bone_ += mesh_->getNumberOfBones();
-		current_bone_ %= mesh_->getNumberOfBones();
-	} else if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_RELEASE) {
-		current_bone_++;
-		current_bone_ += mesh_->getNumberOfBones();
-		current_bone_ %= mesh_->getNumberOfBones();
-	} else if (key == GLFW_KEY_T && action != GLFW_RELEASE) {
-		transparent_ = !transparent_;
 	}
 }
 
@@ -145,13 +129,6 @@ MatrixPointers GUI::getMatrixPointers() const
 	return ret;
 }
 
-bool GUI::setCurrentBone(int i)
-{
-	if (i < 0 || i >= mesh_->getNumberOfBones())
-		return false;
-	current_bone_ = i;
-	return true;
-}
 
 bool GUI::captureWASDUPDOWN(int key, int action)
 {

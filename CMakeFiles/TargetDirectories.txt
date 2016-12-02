@@ -1,6 +1,0 @@
-/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/rebuild_cache.dir
-/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/edit_cache.dir
-/Users/dkelle/Google Drive/CS354 Graphics/cubehands/CMakeFiles/utgraphicsutil.dir
-/Users/dkelle/Google Drive/CS354 Graphics/cubehands/src/CMakeFiles/rebuild_cache.dir
-/Users/dkelle/Google Drive/CS354 Graphics/cubehands/src/CMakeFiles/edit_cache.dir
-/Users/dkelle/Google Drive/CS354 Graphics/cubehands/src/CMakeFiles/skinning.dir

@@ -1,5 +1,4 @@
 #include "procedure_geometry.h"
-#include "bone_geometry.h"
 #include "config.h"
 
 void create_floor(std::vector<glm::vec4>& floor_vertices, std::vector<glm::uvec3>& floor_faces)
