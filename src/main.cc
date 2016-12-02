@@ -5,6 +5,7 @@
 #include "config.h"
 #include "gui.h"
 #include "menger.h"
+#include "Sample.h"
 #include "procedure_geometry.h"
 
 #include <algorithm>
@@ -78,6 +79,13 @@ std::shared_ptr<Menger> g_menger;
 int main(int argc, char* argv[])
 {
     GLFWwindow *window = init_glefw();
+    SampleListener listener;
+    Controller controller;
+
+    // Have the sample listener receive events from the controller
+    controller.addListener(listener);
+    controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
+
     GUI gui(window);
 
     std::vector<glm::vec4> floor_vertices;
@@ -213,6 +221,12 @@ int main(int argc, char* argv[])
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, floor_faces.size() * 3, GL_UNSIGNED_INT, 0));
         }
         cube_pass.setup();
+        std::vector<glm::vec4> hand_pos = listener.get_hand_positions();
+        glm::vec4 left = hand_pos[0];
+        glm::vec4 right = hand_pos[1];
+        std::cout << glm::to_string(left) << std::endl;
+        std::cout << glm::to_string(right) << std::endl;
+
         CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
         // Poll and swap.
         glfwPollEvents();
