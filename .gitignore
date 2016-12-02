@@ -1,4 +1,12 @@
-build/*;
-CMakeFiles/*;
+build/*
+CMakeFiles/*
 CMakeCache.txt
 CMakeFiles
+CMakeFiles/
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Makefile
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
