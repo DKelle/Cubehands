@@ -1,4 +1,5 @@
 build/*
+link.txt
 CMakeFiles/*
 CMakeCache.txt
 CMakeFiles
