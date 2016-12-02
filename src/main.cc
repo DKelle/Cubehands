@@ -7,6 +7,7 @@
 #include "config.h"
 #include "gui.h"
 #include "menger.h"
+#include "Sample.cpp"
 
 #include <algorithm>
 #include <fstream>
