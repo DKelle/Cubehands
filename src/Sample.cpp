@@ -253,9 +253,47 @@ void SampleListener::onServiceDisconnect(const Controller& controller) {
     if(print_leap_stats) std::cout << "Service Disconnected" << std::endl;
 }
 
-std::vector<glm::vec4> SampleListener::get_hand_positions()
+std::vector<glm::vec4> SampleListener::get_hand_positions(int width, int height)
 {
-    return hand_positions;
+    return transform_to_world(hand_positions, width, height);
+}
+
+
+std::vector<glm::vec4> SampleListener::transform_to_world(std::vector<glm::vec4> hand_positions, int width, int height)
+{
+
+    float leap_max = 600;
+
+    //Transform X. X ranges from -300 to 300 in leap coordinates
+    float x_left = hand_positions[0].x;
+    float x_right = hand_positions[1].x;
+
+    float world_x_left = (x_left / leap_max) * width;
+    float world_x_right = (x_right / leap_max) * width;
+
+    //transform Y. Y ranges from 0 to 600 in leap coordinates
+    float y_left = hand_positions[0].y;
+    float y_right = hand_positions[1].y;
+
+    float world_y_left = (y_left / leap_max) * height;
+    float world_y_right = (y_right / leap_max) * height;
+
+    //transform Z. Z ranges from -300 to 300 in leap coordinates
+    float z_left = hand_positions[0].z - 100;
+    float z_right = hand_positions[1].z - 100;
+    std::cout << z_right << std::endl;
+
+    float world_z_left = (z_left / leap_max) * width;
+    float world_z_right = (z_right / leap_max) * width;
+
+    //Create the new hand position vector
+    glm::vec4 left = glm::vec4(world_x_left, world_y_left, world_z_left, hand_positions[0].w);
+    glm::vec4 right = glm::vec4(world_x_right, world_y_right, world_z_right, hand_positions[1].w);
+
+    std::vector<glm::vec4> world_positions;
+    world_positions.push_back(left);
+    world_positions.push_back(right);
+    return world_positions;
 }
 /*
 int main(int argc, char** argv) {

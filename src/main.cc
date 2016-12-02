@@ -1,3 +1,5 @@
+
+
 #include <GL/glew.h>
 #include <dirent.h>
 
@@ -92,8 +94,6 @@ int main(int argc, char* argv[])
     std::vector<glm::uvec3> floor_faces;
     create_floor(floor_vertices, floor_faces);
 
-
-
     glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
     MatrixPointers mats; // Define MatrixPointers here for lambda to capture
     /*
@@ -145,8 +145,8 @@ int main(int argc, char* argv[])
         else
             return &non_transparet;
     };
-    // FIXME: add more lambdas for data_source if you want to use RenderPass.
-    //        Otherwise, do whatever you like here
+    
+    //Use these definitions to send matrices to renderpass
     ShaderUniform std_model = { "model", matrix_binder, std_model_data };
     ShaderUniform floor_model = { "model", matrix_binder, floor_model_data };
     ShaderUniform std_view = { "view", matrix_binder, std_view_data };
@@ -154,10 +154,8 @@ int main(int argc, char* argv[])
     ShaderUniform std_proj = { "projection", matrix_binder, std_proj_data };
     ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
     ShaderUniform object_alpha = { "alpha", float_binder, alpha_data };
-    // FIXME: define more ShaderUniforms for RenderPass if you want to use it.
-    //        Otherwise, do whatever you like here
 
-
+    //Create the floor
     RenderDataInput floor_pass_input;
     floor_pass_input.assign(0, "vertex_position", floor_vertices.data(), floor_vertices.size(), 4, GL_FLOAT);
     floor_pass_input.assign_index(floor_faces.data(), floor_faces.size(), 3);
@@ -169,10 +167,11 @@ int main(int argc, char* argv[])
             );
     float aspect = 0.0f;
 
+    //Create the center cube
     std::vector<glm::vec4> cube_vertices;
     std::vector<glm::vec4> vtx_normals;
     std::vector<glm::uvec3> cube_faces;
-    g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, glm::vec3(0.0,5.0,0.0));
+    g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, glm::vec3(0.0,15.0,0.0));
 
     RenderDataInput cube_pass_input;
     cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
@@ -185,10 +184,46 @@ int main(int argc, char* argv[])
             { "fragment_color" }
             );
 
+    //Create the left hand 
+    std::vector<glm::vec4> left_vertices;
+    std::vector<glm::vec4> left_normals;
+    std::vector<glm::uvec3> left_faces;
+    g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(0.0,15.0,0.0));
+
+    RenderDataInput left_pass_input;
+    left_pass_input.assign(0, "vertex_position", left_vertices.data(), left_vertices.size(), 4, GL_FLOAT);
+    left_pass_input.assign(1, "normal", left_normals.data(), left_normals.size(), 4, GL_FLOAT);
+    left_pass_input.assign_index(left_faces.data(), left_faces.size(), 3);
+    RenderPass left_pass(-1,
+            left_pass_input,
+            { vertex_shader, geometry_shader, cube_fragment_shader},
+            { std_model, std_view, std_proj, std_light },
+            { "fragment_color" }
+            );
+
+    //Create the right hande
+    std::vector<glm::vec4> right_vertices;
+    std::vector<glm::vec4> right_normals;
+    std::vector<glm::uvec3> right_faces;
+    g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
+
+    RenderDataInput right_pass_input;
+    right_pass_input.assign(0, "vertex_position", right_vertices.data(), right_vertices.size(), 4, GL_FLOAT);
+    right_pass_input.assign(1, "normal", right_normals.data(), right_normals.size(), 4, GL_FLOAT);
+    right_pass_input.assign_index(right_faces.data(), right_faces.size(), 3);
+    RenderPass right_pass(-1,
+            right_pass_input,
+            { vertex_shader, geometry_shader, cube_fragment_shader},
+            { std_model, std_view, std_proj, std_light },
+            { "fragment_color" }
+            );
+
     bool draw_floor = true;
     bool draw_skeleton = true;
     bool draw_object = true;
     bool draw_cylinder = true;
+    bool draw_left;
+    bool draw_right; 
 
     while (!glfwWindowShouldClose(window)) {
         // Setup some basic window stuff.
@@ -221,13 +256,39 @@ int main(int argc, char* argv[])
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, floor_faces.size() * 3, GL_UNSIGNED_INT, 0));
         }
         cube_pass.setup();
-        std::vector<glm::vec4> hand_pos = listener.get_hand_positions();
-        glm::vec4 left = hand_pos[0];
-        glm::vec4 right = hand_pos[1];
-        std::cout << glm::to_string(left) << std::endl;
-        std::cout << glm::to_string(right) << std::endl;
+
 
         CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
+
+        //Get the current hand positions
+        std::vector<glm::vec4> hand_pos = listener.get_hand_positions(100, 100 );
+        glm::vec4 left = hand_pos[0];
+        glm::vec4 right = hand_pos[1];
+        draw_left = left.w;
+        draw_right = right.w;
+        std::cout << glm::to_string(right) << std::endl;
+
+        //Render the left hand
+        if(draw_left)
+        {
+            std::cout <<"drawing left"<<std::endl;
+            left_pass.setup();
+            g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(left));
+            left_pass.updateVBO(0, left_vertices.data(), left_vertices.size());	
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_faces.size() * 3, GL_UNSIGNED_INT, 0));
+            
+        }
+        //Render the right hand
+        if(draw_right)
+        {
+            std::cout <<"Drawing right" << std::endl;
+            right_pass.setup();
+            g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(right));
+            right_pass.updateVBO(0, right_vertices.data(), right_vertices.size());	
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_faces.size() * 3, GL_UNSIGNED_INT, 0));
+            
+        }
+
         // Poll and swap.
         glfwPollEvents();
         glfwSwapBuffers(window);

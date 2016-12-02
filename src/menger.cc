@@ -40,16 +40,12 @@ Menger::generate_geometry(std::vector<glm::vec4>& obj_vertices,
                           std::vector<glm::uvec3>& obj_faces,
                           glm::vec3 origin) const
 {
-    // if (nesting_level_ == 0) {
-    //    drawCube(obj_vertices, obj_faces, vtx_normals,
-    //             -0.50f, -0.50f, -0.50f, 0.50f, 0.50f, 0.50f);
-    // }
-    // else {
-        generate_cubes(obj_vertices, vtx_normals, obj_faces, origin.x - 5.00f, origin.y - 5.00f, origin.z - 5.00f, 
-                                                            origin.x + 5.00f, origin.y + 5.00f, origin.z + 5.00f);
-        // generate_cubes(obj_vertices, vtx_normals, obj_faces, 5.50f, 5.50f, 5.50f, 15.50f, 15.50f, 15.50f);
-        // generate_cubes(obj_vertices, vtx_normals, obj_faces, 5.50f, 5.50f, 5.50f, 15.50f, 15.50f, 15.50f);
 
+    obj_vertices.clear();
+    vtx_normals.clear();
+    obj_faces.clear();
+    generate_cubes(obj_vertices, vtx_normals, obj_faces, origin.x - 5.00f, origin.y - 5.00f, origin.z - 5.00f, 
+                                                         origin.x + 5.00f, origin.y + 5.00f, origin.z + 5.00f);
     // }
 }
 
