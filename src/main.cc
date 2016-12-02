@@ -6,7 +6,8 @@
 #include "render_pass.h"
 #include "config.h"
 #include "gui.h"
-#include "Sample.cpp"
+#include "menger.h"
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -36,6 +37,10 @@ const char* fragment_shader =
 
 const char* floor_fragment_shader =
 #include "shaders/floor.frag"
+;
+
+const char* cube_fragment_shader =
+#include "shaders/cube.frag"
 ;
 
 // FIXME: Add more shaders here.
@@ -69,6 +74,8 @@ GLFWwindow* init_glefw()
 	return ret;
 }
 
+std::shared_ptr<Menger> g_menger;
+
 int main(int argc, char* argv[])
 {
 	if (argc < 2) {
@@ -82,26 +89,6 @@ int main(int argc, char* argv[])
 	std::vector<glm::vec4> floor_vertices;
 	std::vector<glm::uvec3> floor_faces;
 	create_floor(floor_vertices, floor_faces);
-
-    //add our leap motion code
-    // Create a sample listener and controller
-    SampleListener listener;
-    Controller controller;
-
-    // Have the sample listener receive events from the controller
-    controller.addListener(listener);
-
-    if (argc > 1 && strcmp(argv[1], "--bg") == 0)
-      controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
-
-    /*
-    // Keep this process running until Enter is pressed
-    std::cout << "Press Enter to quit..." << std::endl;
-    std::cin.get();
-
-    // Remove the sample listener when done
-    controller.removeListener(listener);
-    */
 
 	Mesh mesh;
 	mesh.loadpmd(argv[1]);
@@ -221,6 +208,22 @@ int main(int argc, char* argv[])
 	float aspect = 0.0f;
 	std::cout << "center = " << mesh.getCenter() << "\n";
 
+	std::vector<glm::vec4> cube_vertices;
+	std::vector<glm::vec4> vtx_normals;
+	std::vector<glm::uvec3> cube_faces;
+	g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, glm::vec3(0.0,5.0,0.0));
+
+	RenderDataInput cube_pass_input;
+	cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
+	cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+	cube_pass_input.assign_index(cube_faces.data(), cube_faces.size(), 3);
+	RenderPass cube_pass(-1,
+			cube_pass_input,
+			{ vertex_shader, geometry_shader, cube_fragment_shader},
+			{ std_model, std_view, std_proj, std_light },
+			{ "fragment_color" }
+			);
+
 	bool draw_floor = true;
 	bool draw_skeleton = true;
 	bool draw_object = true;
@@ -256,30 +259,8 @@ int main(int argc, char* argv[])
 			// Draw our triangles.
 			CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, floor_faces.size() * 3, GL_UNSIGNED_INT, 0));
 		}
-		if (draw_object) {
-			if (gui.isPoseDirty()) {
-				mesh.updateAnimation();
-				object_pass.updateVBO(0,
-						      mesh.animated_vertices.data(),
-						      mesh.animated_vertices.size());
-#if 0
-				// For debugging if you need it.
-				for (int i = 0; i < 4; i++) {
-					std::cerr << " Vertex " << i << " from " << mesh.vertices[i] << " to " << mesh.animated_vertices[i] << std::endl;
-				}
-#endif
-				gui.clearPose();
-			}
-			object_pass.setup();
-			int mid = 0;
-			while (object_pass.renderWithMaterial(mid))
-				mid++;
-#if 0	
-			// For debugging also
-			if (mid == 0) // Fallback
-				CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, mesh.faces.size() * 3, GL_UNSIGNED_INT, 0));
-#endif
-		}
+		cube_pass.setup();
+		CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
 		// Poll and swap.
 		glfwPollEvents();
 		glfwSwapBuffers(window);
