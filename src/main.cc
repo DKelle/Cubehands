@@ -6,6 +6,7 @@
 #include "render_pass.h"
 #include "config.h"
 #include "gui.h"
+#include "menger.h"
 #include "Sample.cpp"
 #include <algorithm>
 #include <fstream>
