@@ -1,4 +1,5 @@
 #include "menger.h"
+#include <glm/gtx/rotate_vector.hpp>
 
 namespace {
     const int kMinLevel = 0;
@@ -40,12 +41,13 @@ Menger::generate_geometry(std::vector<glm::vec4>& obj_vertices,
                           std::vector<glm::uvec3>& obj_faces,
                           glm::vec3 origin) const
 {
-
-    obj_vertices.clear();
-    vtx_normals.clear();
-    obj_faces.clear();
-    generate_cubes(obj_vertices, vtx_normals, obj_faces, origin.x - 5.00f, origin.y - 5.00f, origin.z - 5.00f, 
-                                                         origin.x + 5.00f, origin.y + 5.00f, origin.z + 5.00f);
+    // if (nesting_level_ == 0) {
+    //    drawCube(obj_vertices, obj_faces, vtx_normals,
+    //             -0.50f, -0.50f, -0.50f, 0.50f, 0.50f, 0.50f);
+    // }
+    // else {
+        generate_cubes(obj_vertices, vtx_normals, obj_faces, origin.x - 5.00f, origin.y - 5.00f, origin.z - 5.00f, 
+                                                            origin.x + 5.00f, origin.y + 5.00f, origin.z + 5.00f);
     // }
 }
 
@@ -93,13 +95,13 @@ void Menger::drawCube(std::vector<glm::vec4>& obj_vertices,
 
     obj_vertices.push_back(glm::vec4(minx, miny, maxz, 1.0f));
     obj_vertices.push_back(glm::vec4(maxx, miny, maxz, 1.0f));
-    obj_vertices.push_back(glm::vec4(minx, maxy, maxz, 1.0f));
+    obj_vertices.push_back(glm::vec4(maxx, maxy, maxz, 1.0f));
 
     triangle(obj_faces, vtx_normals, front_norm, length, 0, 1, 2);
 
-    obj_vertices.push_back(glm::vec4(maxx, miny, maxz, 1.0f));
     obj_vertices.push_back(glm::vec4(maxx, maxy, maxz, 1.0f));
     obj_vertices.push_back(glm::vec4(minx, maxy, maxz, 1.0f));
+    obj_vertices.push_back(glm::vec4(minx, miny, maxz, 1.0f));
     
     triangle(obj_faces, vtx_normals, front_norm, length, 3, 4, 5);
 
@@ -188,4 +190,14 @@ void Menger::triangle(std::vector<glm::uvec3>& obj_faces,
     vtx_normals.push_back(normal);
     vtx_normals.push_back(normal);
     vtx_normals.push_back(normal);
+}
+
+void Menger::rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_faces,std::vector<glm::vec4>& obj_vertices) {
+    obj_faces.clear();
+    glm::mat4 rotate_mat = glm::rotate(speed, axis);
+    for (int n = 0; n < obj_vertices.size(); n++) {
+	   obj_vertices[n] = rotate_mat * obj_vertices[n];
+    	if (n%3 == 0) 
+	        obj_faces.push_back(glm::uvec3(n-3,n-2,n-1));
+    }
 }
