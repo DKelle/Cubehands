@@ -17,6 +17,9 @@ void SampleListener::onInit(const Controller& controller) {
     //push back two empty vectors for hand positions
     hand_positions.push_back(glm::vec4(0,0,0,0));
     hand_positions.push_back(glm::vec4(0,0,0,0));
+
+    old_hand_positions.push_back(glm::vec4(0,0,0,0));
+    old_hand_positions.push_back(glm::vec4(0,0,0,0));
 }
 
 void SampleListener::onConnect(const Controller& controller) {
@@ -77,6 +80,7 @@ void SampleListener::onFrame(const Controller& controller) {
 
         //add this glm::vec4 to the correct position in hand_positions
         int index = (hand.isLeft()) ? 0 : 1;
+        old_hand_positions[index] = hand_positions[index];
         hand_positions[index] = glm_pos;
 
         if(print_leap_stats)
@@ -258,6 +262,10 @@ std::vector<glm::vec4> SampleListener::get_hand_positions(int width, int height)
     return transform_to_world(hand_positions, width, height);
 }
 
+std::vector<glm::vec4> SampleListener::get_old_hand_positions(int width, int height)
+{
+    return transform_to_world(old_hand_positions, width, height);
+}
 
 std::vector<glm::vec4> SampleListener::transform_to_world(std::vector<glm::vec4> hand_positions, int width, int height)
 {

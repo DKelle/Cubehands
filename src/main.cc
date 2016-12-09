@@ -257,11 +257,10 @@ int main(int argc, char* argv[])
         }
         cube_pass.setup();
 
-
         CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
 
         //Get the current hand positions
-        std::vector<glm::vec4> hand_pos = listener.get_hand_positions(100, 100 );
+        std::vector<glm::vec4> hand_pos = listener.get_hand_positions(100, 100);
         glm::vec4 left = hand_pos[0];
         glm::vec4 right = hand_pos[1];
         draw_left = left.w;
@@ -288,6 +287,17 @@ int main(int argc, char* argv[])
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_faces.size() * 3, GL_UNSIGNED_INT, 0));
             
         }
+
+        //calculate the delta hand positions, and the axis of rotation
+        std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
+        glm::vec4 old_left = old_hand_pos[0];
+        glm::vec4 old_right = old_hand_pos[1];
+        glm::vec4 delta_left = old_left - left;
+        glm::vec4 delta_right = old_right - right;
+        glm::vec3 delta_left_3 = glm::vec3(delta_left);
+        glm::vec3 delta_right_3 = glm::vec3(delta_right);
+
+        glm::vec3 rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
 
         // Poll and swap.
         glfwPollEvents();

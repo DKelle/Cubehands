@@ -21,11 +21,13 @@ class SampleListener : public Listener {
     virtual void onServiceConnect(const Controller&);
     virtual void onServiceDisconnect(const Controller&);
     std::vector<glm::vec4> get_hand_positions(int width, int height);
+    std::vector<glm::vec4> get_old_hand_positions(int width, int height);
     std::vector<glm::vec4> transform_to_world(std::vector<glm::vec4> hand_positions, int width, int height);
 
 
   private:
     std::vector<glm::vec4> hand_positions;
+    std::vector<glm::vec4> old_hand_positions;
     bool print_leap_stats;
 
 };
