@@ -246,32 +246,6 @@ int main(int argc, char* argv[])
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, floor_faces.size() * 3, GL_UNSIGNED_INT, 0));
         }
         
-        RenderDataInput cube_pass_input;
-        cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
-        cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
-        cube_pass_input.assign_index(cube_faces.data(), cube_faces.size(), 3);
-        RenderPass cube_pass(-1,
-                cube_pass_input,
-                { vertex_shader, geometry_shader, cube_fragment_shader},
-                { std_model, std_view, std_proj, std_light },
-                { "fragment_color" }
-                );
-
-        // cube_faces.clear();
-            g_menger->rotate(0.05f, glm::vec3(0,1,1), cube_faces, cube_vertices);
-//      glm::mat4 rotate_mat = glm::rotate(0.05f,glm::vec3(0,1,1));
-//      for (int n = 0; n < cube_vertices.size(); n++) {
-//      cube_vertices[n] = rotate_mat * cube_vertices[n];
-//          if (n%3 == 0) 
-//                  cube_faces.push_back(glm::uvec3(n-3,n-2,n-1));
-
-//      }
-        cube_pass.setup();
-        glDisable(GL_CULL_FACE);
-        CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
-    
-        
-        
         //Get the current hand positions
         std::vector<glm::vec4> hand_pos = listener.get_hand_positions(100, 100);
         glm::vec4 left = hand_pos[0];
@@ -312,6 +286,22 @@ int main(int argc, char* argv[])
 
         glm::vec3 rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
 
+
+         RenderDataInput cube_pass_input;
+        cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
+        cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+        cube_pass_input.assign_index(cube_faces.data(), cube_faces.size(), 3);
+        RenderPass cube_pass(-1,
+                cube_pass_input,
+                { vertex_shader, geometry_shader, cube_fragment_shader},
+                { std_model, std_view, std_proj, std_light },
+                { "fragment_color" }
+                );
+
+        g_menger->rotate(0.05f, rot, cube_faces, cube_vertices);
+        cube_pass.setup();
+        glDisable(GL_CULL_FACE);
+        CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
         // Poll and swap.
         glfwPollEvents();
         glfwSwapBuffers(window);
