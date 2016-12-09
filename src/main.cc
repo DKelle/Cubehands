@@ -297,7 +297,17 @@ int main(int argc, char* argv[])
         glm::vec3 delta_left_3 = glm::vec3(delta_left);
         glm::vec3 delta_right_3 = glm::vec3(delta_right);
 
+        float speed = (glm::length(delta_left_3) + glm::length(delta_right_3)) / 2;
         glm::vec3 rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
+
+        //check that our hands were visible this fram and last frame
+        bool draw_old_left = old_left.w;
+        bool draw_old_right = old_right.w;
+
+        if(draw_old_left && draw_old_right && draw_right && draw_left)
+        {
+            printf("Should be trying to rotate now");
+        }        
 
         // Poll and swap.
         glfwPollEvents();
