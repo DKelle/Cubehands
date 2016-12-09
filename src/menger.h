@@ -27,7 +27,7 @@ public:
 	void triangle(std::vector<glm::uvec3>& obj_faces,
                     std::vector<glm::vec4>& vtx_normals,
                     glm::vec4 normal, glm::uvec3 length,
-                    uint a, uint b, uint c) const;
+                    int a, int b, int c) const;
         void rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices); 
 private:
         int index = 0;

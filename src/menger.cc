@@ -184,7 +184,7 @@ void Menger::drawCube(std::vector<glm::vec4>& obj_vertices,
 void Menger::triangle(std::vector<glm::uvec3>& obj_faces,
                     std::vector<glm::vec4>& vtx_normals,
                     glm::vec4 normal, glm::uvec3 length, 
-                    uint a, uint b, uint c) const {
+                    int a, int b, int c) const {
 
     obj_faces.push_back(glm::uvec3(a+length.x, b+length.y, c+length.z));// + length);
     vtx_normals.push_back(normal);
