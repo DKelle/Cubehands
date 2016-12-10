@@ -365,8 +365,6 @@ int main(int argc, char* argv[])
 
         if(rotate)
         {
-            printf("speed is %f and axis of rotation is ", speed);
-            std::cout << glm::to_string(rot) << std::endl;
             float temp_speed = (direction < 0) ? -.1f : .1f;
             g_menger->rotate(temp_speed, avg_rot, cube_faces, cube_vertices);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
