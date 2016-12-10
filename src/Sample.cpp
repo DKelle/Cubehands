@@ -368,10 +368,10 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
     int counter = 0;
     for(int i = 0; i < bone_indices.size(); i++) {
         glm::vec4 first_point = bone_vertices.at(bone_indices[i][0]);
-        glm::vec4 second_point = glm::vec4(0,0,0,1);
+        glm::vec4 second_point = bone_vertices.at(bone_indices[i][1]);
 
         first_point = convertLeapToWorld(first_point, SCALE_WIDTH, SCALE_HEIGHT);
-        // second_point = convertLeapToWorld(second_point, SCALE_WIDTH, SCALE_HEIGHT);
+        second_point = convertLeapToWorld(second_point, SCALE_WIDTH, SCALE_HEIGHT);
         hand_vertices.push_back(first_point);
         hand_vertices.push_back(second_point);
 

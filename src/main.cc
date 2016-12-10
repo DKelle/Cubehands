@@ -236,9 +236,14 @@ int main(int argc, char* argv[])
     //Render the right hand    
     std::vector<glm::vec4> hand_vertices;
     std::vector<glm::uvec2> hand_indices;
-    hand_vertices.push_back(glm::vec4(0,0,-1,1));
-    hand_vertices.push_back(glm::vec4(0,100,-1, 1));
-    hand_indices.push_back(glm::uvec2(0,1));
+    int counter = 0;
+    for(int i = 0; i < 400; i ++)
+    {
+        hand_vertices.push_back(glm::vec4(0,0,-1,1));
+        hand_vertices.push_back(glm::vec4(0,100,-1, 1));
+        hand_indices.push_back(glm::uvec2(counter, counter+1));
+        counter += 2;
+    }
     // g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
 
     RenderDataInput hand_pass_input;
@@ -298,7 +303,7 @@ int main(int argc, char* argv[])
         draw_right = right.w;
         // std::cout << glm::to_string(right) << std::endl;
 
-        if(draw_left) {
+        if(draw_left || draw_right) {
 
 
             // Leap::Frame frame = controller.frame();         
@@ -329,7 +334,7 @@ int main(int argc, char* argv[])
             left_pass.setup();
             g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(left));
             left_pass.updateVBO(0, left_vertices.data(), left_vertices.size());	
-            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_faces.size() * 3, GL_UNSIGNED_INT, 0));
+            //CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_faces.size() * 3, GL_UNSIGNED_INT, 0));
             
         }
         //Render the right hand
@@ -339,7 +344,7 @@ int main(int argc, char* argv[])
             right_pass.setup();
             g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(right));
             right_pass.updateVBO(0, right_vertices.data(), right_vertices.size());	
-            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_faces.size() * 3, GL_UNSIGNED_INT, 0));
+            //CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_faces.size() * 3, GL_UNSIGNED_INT, 0));
             
         }
 
