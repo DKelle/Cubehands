@@ -197,10 +197,13 @@ void Menger::triangle(std::vector<glm::uvec3>& obj_faces,
 }
 
 void Menger::rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_faces,std::vector<glm::vec4>& obj_vertices) {
+    glm::vec4 origin = glm::vec4(0,15,0,0);
     obj_faces.clear();
     glm::mat4 rotate_mat = glm::rotate(speed, axis);
     for (int n = 0; n < obj_vertices.size(); n++) {
-	   obj_vertices[n] = rotate_mat * obj_vertices[n];
+	   obj_vertices[n] = obj_vertices[n] - origin;
+       obj_vertices[n] = rotate_mat * obj_vertices[n];
+       obj_vertices[n] = obj_vertices[n] + origin;
     	if (n%3 == 0) 
 	        obj_faces.push_back(glm::uvec3(n-3,n-2,n-1));
     }

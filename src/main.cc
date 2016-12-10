@@ -347,7 +347,7 @@ int main(int argc, char* argv[])
         glm::vec3 delta_left_3 = glm::vec3(delta_left);
         glm::vec3 delta_right_3 = glm::vec3(delta_right);
 
-        float speed = (glm::length(delta_left_3) + glm::length(delta_right_3)) / 20;
+        float direction = glm::dot(delta_left_3, glm::vec3(0,1,0));
         glm::vec3 rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
 
         //check that our hands were visible this fram and last frame
@@ -357,13 +357,15 @@ int main(int argc, char* argv[])
         int left_fingers = listener.digits[LEFT];
         int right_fingers = listener.digits[RIGHT];
 
-        bool rotate = draw_old_left && draw_old_right && draw_right && draw_left && left_fingers == 0 && right_fingers == 0;
+        float speed = (glm::length(delta_left_3) + glm::length(delta_right_3))/2;
+        bool rotate = speed > .75 && draw_old_left && draw_old_right && draw_right && draw_left && left_fingers == 0 && right_fingers == 0;
 
         if(rotate)
         {
-            printf("axis of rotation is ");
+            printf("speed is %f and axis of rotation is ", speed);
             std::cout << glm::to_string(rot) << std::endl;
-            g_menger->rotate(.05f, rot, cube_faces, cube_vertices);
+            float temp_speed = (direction < 0) ? -.1f : .1f;
+            g_menger->rotate(temp_speed, rot, cube_faces, cube_vertices);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
         }        
 

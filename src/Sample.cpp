@@ -380,6 +380,9 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
 
     int counter = 0;
     for(int i = 0; i < bone_indices.size(); i++) {
+
+        if(bone_indices[i][0] >= bone_vertices.size() || bone_indices[i][1] >= bone_vertices.size())
+            return;
         glm::vec4 first_point = bone_vertices.at(bone_indices[i][0]);
         glm::vec4 second_point = bone_vertices.at(bone_indices[i][1]);
 
