@@ -246,12 +246,15 @@ void SampleListener::onFrame(const Controller& controller) {
     }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     // this::drawHands(frame);
 
     if (!frame.hands().isEmpty() || !gestures.isEmpty()) {
         std::cout << std::endl;
     }
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 }

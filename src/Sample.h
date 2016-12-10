@@ -43,6 +43,10 @@ class SampleListener : public Listener {
 
     std::vector<glm::vec4> old_hand_positions;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+    bool print_leap_stats = true;
+>>>>>>> Stashed changes
 =======
     bool print_leap_stats = true;
 >>>>>>> Stashed changes
