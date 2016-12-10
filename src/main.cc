@@ -359,6 +359,7 @@ int main(int argc, char* argv[])
 
         float speed = (glm::length(delta_left_3) + glm::length(delta_right_3))/2;
         bool rotate = speed > .75 && draw_old_left && draw_old_right && draw_right && draw_left && left_fingers == 0 && right_fingers == 0;
+        bool scale = speed > .6 && left_fingers == 5 && right_fingers == 5 && draw_old_left && draw_old_right && draw_left && draw_right;
 
         if(rotate)
         {
@@ -367,7 +368,13 @@ int main(int argc, char* argv[])
             float temp_speed = (direction < 0) ? -.1f : .1f;
             g_menger->rotate(temp_speed, rot, cube_faces, cube_vertices);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
-        }        
+        } else if(scale)
+        {
+            printf("speed is %f ", speed);
+            float temp_speed = (direction < 0) ? -.1f : .1f;
+            //g_menger->scale(temp_speed, cube_faces, cube_vertices);
+            cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+        }
 
         // Poll and swap.
         glfwPollEvents();
