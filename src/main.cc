@@ -233,12 +233,12 @@ int main(int argc, char* argv[])
     bool draw_right; 
 
 
-        //Create the right hande
+    //Render the right hand    
     std::vector<glm::vec4> hand_vertices;
     std::vector<glm::uvec2> hand_indices;
-    // hand_vertices.push_back(glm::vec4(0,0,0,1));
-    // hand_vertices.push_back(glm::vec4(0,100,0, 1));
-    // hand_indices.push_back(glm::uvec2(0,1));
+    hand_vertices.push_back(glm::vec4(0,0,-1,1));
+    hand_vertices.push_back(glm::vec4(0,100,-1, 1));
+    hand_indices.push_back(glm::uvec2(0,1));
     // g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
 
     RenderDataInput hand_pass_input;
@@ -303,6 +303,7 @@ int main(int argc, char* argv[])
 
             // Leap::Frame frame = controller.frame();         
             listener.drawHands(hand_vertices, hand_indices);
+            hands_pass.setup();
             hands_pass.updateVBO(0, hand_vertices.data(), hand_vertices.size());
 
             // printf("hands_: %lu\n", hand_vertices.size());

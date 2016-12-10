@@ -364,8 +364,6 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
     hand_vertices.clear();
     hand_indices.clear();
 
-    if(hand_positions[0].w == 0)
-        return;
     glm::vec4 left= convertLeapToWorld(hand_positions[0], SCALE_WIDTH, SCALE_HEIGHT);
     // glm::vec4 right = convertLeapToWorld(hand_positions[1], SCALE_WIDTH, SCALE_HEIGHT);
 
@@ -375,7 +373,7 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
 
     hand_vertices.push_back(glm::vec4(0,100,0,1));
     hand_vertices.push_back(glm::vec4(0,0,0,1));
-    hand_indices.push_back(glm::uvec2(hand_vertices.size() - 2, hand_vertices.size() - 1));
+    hand_indices.push_back(glm::uvec2(0,1));
 
 
     // hand_vertices.push_back(right);
