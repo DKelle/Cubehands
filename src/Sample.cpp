@@ -6,10 +6,17 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 #include "Sample.h"
+#include <glm/gtx/component_wise.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/io.hpp>
+#include <debuggl.h>
 
 const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
 const std::string boneNames[] = {"Metacarpal", "Proximal", "Middle", "Distal"};
 const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"};
+
+const int CYLINDER_RADIUS = 1;
 
 void SampleListener::onInit(const Controller& controller) {
     std::cout << "Initialized" << std::endl;
@@ -43,6 +50,8 @@ void SampleListener::onFrame(const Controller& controller) {
     //Set the w coord of both hands to 0
     hand_positions[0].w = 0;
     hand_positions[1].w = 0;
+    bone_vertices.clear();
+    bone_indices.clear();
 
     // Get the most recent frame and report some basic information
     const Frame frame = controller.frame();
@@ -120,6 +129,21 @@ void SampleListener::onFrame(const Controller& controller) {
                                         << ", end: " << bone.nextJoint()
                                         << ", direction: " << bone.direction() << std::endl;
                 }
+
+                glm::vec4 start = bone.prevJoint().toVector4<glm::vec4>();
+                start.w = 1;
+                // std::cout << "pre Start bone leap: " << glm::to_string(start) << std::endl;
+                // start = convertLeapToWorld(start, width, height);
+                glm::vec4 end = bone.nextJoint().toVector4<glm::vec4>();
+                end.w = 1;
+                // end = convertLeapToWorld(end, width, height);
+                // std::cout << "Start bone world: " << glm::to_string(start) << std::endl;
+                // printf("hand positions: \n");
+                // std::cout << glm::to_string(hand_positions[0]) << std::endl;
+
+                bone_vertices.push_back(start);
+                bone_vertices.push_back(end);
+                bone_indices.push_back(glm::uvec2(bone_vertices.size() - 2, bone_vertices.size() - 1));
             }
         }
     }
@@ -221,6 +245,8 @@ void SampleListener::onFrame(const Controller& controller) {
         }
     }
 
+    // this::drawHands(frame);
+
     if (!frame.hands().isEmpty() || !gestures.isEmpty()) {
         std::cout << std::endl;
     }
@@ -259,42 +285,119 @@ std::vector<glm::vec4> SampleListener::get_hand_positions(int width, int height)
 }
 
 
+glm::vec4 SampleListener::convertLeapToWorld(glm::vec4 vector, int width, int height) {
+    glm::vec4 world = glm::vec4(0);
+    world.x = (vector.x / LEAP_MAX) * width;
+    world.y = (vector.y / LEAP_MAX) * height;
+    world.z = (vector.z / LEAP_MAX) * width - Z_DEPTH;
+    world.w = vector.w;
+    return world;
+}
+
+
 std::vector<glm::vec4> SampleListener::transform_to_world(std::vector<glm::vec4> hand_positions, int width, int height)
 {
 
-    float leap_max = 600;
+    // float leap_max = 600;
 
-    //Transform X. X ranges from -300 to 300 in leap coordinates
-    float x_left = hand_positions[0].x;
-    float x_right = hand_positions[1].x;
+    // //Transform X. X ranges from -300 to 300 in leap coordinates
+    // float x_left = hand_positions[0].x;
+    // float x_right = hand_positions[1].x;
 
-    float world_x_left = (x_left / leap_max) * width;
-    float world_x_right = (x_right / leap_max) * width;
+    // float world_x_left = (x_left / leap_max) * width;
+    // float world_x_right = (x_right / leap_max) * width;
 
-    //transform Y. Y ranges from 0 to 600 in leap coordinates
-    float y_left = hand_positions[0].y;
-    float y_right = hand_positions[1].y;
+    // //transform Y. Y ranges from 0 to 600 in leap coordinates
+    // float y_left = hand_positions[0].y;
+    // float y_right = hand_positions[1].y;
 
-    float world_y_left = (y_left / leap_max) * height;
-    float world_y_right = (y_right / leap_max) * height;
+    // float world_y_left = (y_left / leap_max) * height;
+    // float world_y_right = (y_right / leap_max) * height;
 
-    //transform Z. Z ranges from -300 to 300 in leap coordinates
-    float z_left = hand_positions[0].z - 100;
-    float z_right = hand_positions[1].z - 100;
-    std::cout << z_right << std::endl;
+    // //transform Z. Z ranges from -300 to 300 in leap coordinates
+    // float z_left = hand_positions[0].z - 100;
+    // float z_right = hand_positions[1].z - 100;
+    // std::cout << z_right << std::endl;
 
-    float world_z_left = (z_left / leap_max) * width;
-    float world_z_right = (z_right / leap_max) * width;
+    // float world_z_left = (z_left / leap_max) * width;
+    // float world_z_right = (z_right / leap_max) * width;
+
+    glm::vec4 left= convertLeapToWorld(hand_positions[0], width, height);
+    glm::vec4 right = convertLeapToWorld(hand_positions[1], width, height);
 
     //Create the new hand position vector
-    glm::vec4 left = glm::vec4(world_x_left, world_y_left, world_z_left, hand_positions[0].w);
-    glm::vec4 right = glm::vec4(world_x_right, world_y_right, world_z_right, hand_positions[1].w);
+    // glm::vec4 left = glm::vec4(world_x_left, world_y_left, world_z_left, hand_positions[0].w);
+    // glm::vec4 right = glm::vec4(world_x_right, world_y_right, world_z_right, hand_positions[1].w);
 
     std::vector<glm::vec4> world_positions;
     world_positions.push_back(left);
     world_positions.push_back(right);
     return world_positions;
 }
+
+// Draws a cylinder for a bone.
+// void SampleListener::drawBone(const Leap::Bone& bone, std::vector<glm::vec4>& bone_vertices, 
+//     std::vector<glm::uvec2>& bone_indices) {
+  
+//     glm::mat4 bone_basis_values = bone.basis().toMatrix4x4<glm::mat4>();
+//   // glm::mat4 bone_basis_values;
+//   // bone.basis().toArray4x4(bone_basis_values);
+//     std::cout << glm::to_string(bone_basis_values) << std::endl;
+//   // glPushMatrix();
+//   glm::vec4 second_point = glm::vec4(0,0,bone.length(), 1);
+//   second_point = bone_basis_values * second_point;
+
+//   glm::vec4 first_point = bone_basis_values * glm::vec4(0,0,0,1);
+//   // printf("first_point: %f, %f, %f\n", first_point.x, first_point.y, first_point.z);
+//   bone_vertices.push_back(first_point);
+//   bone_vertices.push_back(second_point);
+//   bone_indices.push_back(glm::uvec2(bone_vertices.size() - 2, bone_vertices.size() - 1));
+
+
+
+// }
+
+// void SampleListener::drawHands(std::vector<glm::vec4>& bone_vertices, std::vector<glm::uvec2>& bone_indices) {
+void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices, 
+    std::vector<glm::uvec2>& hand_indices) {
+
+    hand_vertices.clear();
+    hand_indices.clear();
+
+    if(hand_positions[0].w == 0)
+        return;
+    glm::vec4 left= convertLeapToWorld(hand_positions[0], SCALE_WIDTH, SCALE_HEIGHT);
+    // glm::vec4 right = convertLeapToWorld(hand_positions[1], SCALE_WIDTH, SCALE_HEIGHT);
+
+    //Create the new hand position vector
+    // glm::vec4 left = glm::vec4(world_x_left, world_y_left, world_z_left, hand_positions[0].w);
+    // glm::vec4 right = glm::vec4(world_x_right, world_y_right, world_z_right, hand_positions[1].w);
+
+    hand_vertices.push_back(glm::vec4(0,100,0,1));
+    hand_vertices.push_back(glm::vec4(0,0,0,1));
+    hand_indices.push_back(glm::uvec2(hand_vertices.size() - 2, hand_vertices.size() - 1));
+
+
+    // hand_vertices.push_back(right);
+    // hand_vertices.push_back(glm::vec4(0,0,0,1));
+    // hand_indices.push_back(glm::uvec2(hand_vertices.size() - 2, hand_vertices.size() - 1));
+  // Leap::Frame frame = controller_.frame();
+
+  // // Draw all the bones in the hands!
+  // for (int h = 0; h < frame.hands().count(); ++h) {
+  //   Leap::Hand hand = frame.hands()[h];
+
+  //   for (int f = 0; f < hand.fingers().count(); ++f) {
+  //     Leap::Finger finger = hand.fingers()[f];
+
+  //     for (int b = 0; b < 4; ++b)
+  //       drawBone(finger.bone(static_cast<Leap::Bone::Type>(b)), bone_vertices, bone_indices);
+  //   }
+  // }
+
+}
+
+
 /*
 int main(int argc, char** argv) {
     // Create a sample listener and controller

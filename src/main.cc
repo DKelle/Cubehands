@@ -45,6 +45,14 @@ const char* cube_fragment_shader =
 #include "shaders/cube.frag"
 ;
 
+const char* hands_vertex_shader = 
+#include "shaders/hands.vert"
+;
+
+const char* hands_fragment_shader = 
+#include "shaders/hands.frag"
+;
+
 // FIXME: Add more shaders here.
 
 void ErrorCallback(int error, const char* description) {
@@ -87,7 +95,6 @@ int main(int argc, char* argv[])
     // Have the sample listener receive events from the controller
     controller.addListener(listener);
     controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
-
     GUI gui(window);
 
     std::vector<glm::vec4> floor_vertices;
@@ -225,6 +232,29 @@ int main(int argc, char* argv[])
     bool draw_left;
     bool draw_right; 
 
+
+        //Create the right hande
+    std::vector<glm::vec4> hand_vertices;
+    std::vector<glm::uvec2> hand_indices;
+    // hand_vertices.push_back(glm::vec4(0,0,0,1));
+    // hand_vertices.push_back(glm::vec4(0,100,0, 1));
+    // hand_indices.push_back(glm::uvec2(0,1));
+    // g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
+
+    RenderDataInput hand_pass_input;
+    hand_pass_input.assign(0, "vertex_position", hand_vertices.data(), hand_vertices.size(), 4, GL_FLOAT);
+    // right_pass_input.assign(1, "normal", right_normals.data(), right_normals.size(), 4, GL_FLOAT);
+    hand_pass_input.assign_index(hand_indices.data(), hand_indices.size(), 2);
+    RenderPass hands_pass(-1,
+            hand_pass_input,
+            { hands_vertex_shader, nullptr, hands_fragment_shader},
+            { std_model, std_view, std_proj},
+            { "fragment_color" }
+            );
+
+
+                // CHECK_GL_ERROR(glDrawElements(GL_LINES, hand_indices.size()*2, GL_UNSIGNED_INT, 0));
+
     while (!glfwWindowShouldClose(window)) {
         // Setup some basic window stuff.
         glfwGetFramebufferSize(window, &window_width, &window_height);
@@ -266,7 +296,30 @@ int main(int argc, char* argv[])
         glm::vec4 right = hand_pos[1];
         draw_left = left.w;
         draw_right = right.w;
-        std::cout << glm::to_string(right) << std::endl;
+        // std::cout << glm::to_string(right) << std::endl;
+
+        if(draw_left) {
+
+
+            // Leap::Frame frame = controller.frame();         
+            listener.drawHands(hand_vertices, hand_indices);
+            hands_pass.updateVBO(0, hand_vertices.data(), hand_vertices.size());
+
+            // printf("hands_: %lu\n", hand_vertices.size());
+            for(int i = 0; i < hand_indices.size(); i++) {
+                printf("hand_indices: %d, %d\n", hand_indices[i][0], hand_indices[i][1]);
+                glm::vec4 first = hand_vertices.at(hand_indices[i][0]);
+                std::cout << "first: "<<glm::to_string(first) << std::endl;
+                glm::vec4 second = hand_vertices.at(hand_indices[i][1]);
+                std::cout << "second: "<<glm::to_string(second) << std::endl;
+
+                // printf("hand_vertices: %f, %f, %f\n", hand_vertices[hand_indices[i]].x, hand_indices[i][1]);
+            }
+            // CHECK_GL_ERROR(
+                CHECK_GL_ERROR(glDrawElements(GL_LINES, hand_indices.size()*2, GL_UNSIGNED_INT, 0));
+            // CHECK_GL_ERROR(glDrawElements(GL_LINES, bone_indices .size() * 2, GL_UNSIGNED_INT, 0));         
+
+        }
 
         //Render the left hand
         if(draw_left)
