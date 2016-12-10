@@ -245,12 +245,15 @@ void SampleListener::onFrame(const Controller& controller) {
         }
     }
 
+<<<<<<< Updated upstream
     // this::drawHands(frame);
 
     if (!frame.hands().isEmpty() || !gestures.isEmpty()) {
         std::cout << std::endl;
     }
 
+=======
+>>>>>>> Stashed changes
 }
 
 void SampleListener::onFocusGained(const Controller& controller) {
@@ -319,8 +322,9 @@ std::vector<glm::vec4> SampleListener::transform_to_world(std::vector<glm::vec4>
     // float z_right = hand_positions[1].z - 100;
     // std::cout << z_right << std::endl;
 
-    // float world_z_left = (z_left / leap_max) * width;
-    // float world_z_right = (z_right / leap_max) * width;
+    //transform Z. Z ranges from -300 to 300 in leap coordinates
+    float z_left = hand_positions[0].z - 100;
+    float z_right = hand_positions[1].z - 100;
 
     glm::vec4 left= convertLeapToWorld(hand_positions[0], width, height);
     glm::vec4 right = convertLeapToWorld(hand_positions[1], width, height);

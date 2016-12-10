@@ -41,5 +41,10 @@ class SampleListener : public Listener {
     std::vector<glm::vec4> bone_vertices;
     std::vector<glm::uvec2> bone_indices;
 
+    std::vector<glm::vec4> old_hand_positions;
+<<<<<<< Updated upstream
+=======
+    bool print_leap_stats = true;
+>>>>>>> Stashed changes
 
 };

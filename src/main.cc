@@ -343,6 +343,37 @@ int main(int argc, char* argv[])
             
         }
 
+        //calculate the delta hand positions, and the axis of rotation
+        std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
+        glm::vec4 old_left = old_hand_pos[0];
+        glm::vec4 old_right = old_hand_pos[1];
+        glm::vec4 delta_left = old_left - left;
+        glm::vec4 delta_right = old_right - right;
+        glm::vec3 delta_left_3 = glm::vec3(delta_left);
+        glm::vec3 delta_right_3 = glm::vec3(delta_right);
+
+        float speed = (glm::length(delta_left_3) + glm::length(delta_right_3)) / 20;
+        glm::vec3 rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
+
+        //check that our hands were visible this fram and last frame
+        bool draw_old_left = old_left.w;
+        bool draw_old_right = old_right.w;
+
+        int left_fingers = listener.digits[LEFT];
+        int right_fingers = listener.digits[RIGHT];
+
+        bool rotate = draw_old_left && draw_old_right && draw_right && draw_left && left_fingers == 0 && right_fingers == 0;
+
+        printf("left fingers is %d \n", left_fingers);
+        printf("right fingers is %d \n", right_fingers);
+
+        if(rotate)
+        {
+            printf("Should be trying to rotate now");
+            g_menger->rotate(speed, rot, cube_faces, cube_vertices);
+            cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+        }        
+
         // Poll and swap.
         glfwPollEvents();
         glfwSwapBuffers(window);
