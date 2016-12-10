@@ -1,3 +1,7 @@
+#define LEFT 0
+#define RIGHT 1
+
+
 #include <iostream>
 #include <cstring>
 #include "Leap.h"
@@ -21,11 +25,12 @@ class SampleListener : public Listener {
     virtual void onServiceConnect(const Controller&);
     virtual void onServiceDisconnect(const Controller&);
     std::vector<glm::vec4> get_hand_positions(int width, int height);
+    std::vector<glm::vec4> get_old_hand_positions(int width, int height);
     std::vector<glm::vec4> transform_to_world(std::vector<glm::vec4> hand_positions, int width, int height);
-    void drawBone(const Leap::Bone& bone, std::vector<glm::vec4>& bone_vertices, 
-    std::vector<glm::uvec2>& bone_indices);
+    void drawBone(const Leap::Bone& bone, std::vector<glm::vec4>& bone_vertices,std::vector<glm::uvec2>& bone_indices);
     void drawHands(std::vector<glm::vec4>& bone_vertices, std::vector<glm::uvec2>& bone_indices);
     glm::vec4 convertLeapToWorld(glm::vec4 vector, int width, int height);
+    std::vector<int> digits;
 
 
     const float Z_DEPTH = 100;
@@ -34,12 +39,12 @@ class SampleListener : public Listener {
     const float SCALE_HEIGHT = 100;
 
 
-
   private:
     std::vector<glm::vec4> hand_positions;
     bool print_leap_stats = false;
     std::vector<glm::vec4> bone_vertices;
     std::vector<glm::uvec2> bone_indices;
+    std::vector<glm::vec4> old_hand_positions;
 
 
 };

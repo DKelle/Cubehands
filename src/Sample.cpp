@@ -24,6 +24,12 @@ void SampleListener::onInit(const Controller& controller) {
     //push back two empty vectors for hand positions
     hand_positions.push_back(glm::vec4(0,0,0,0));
     hand_positions.push_back(glm::vec4(0,0,0,0));
+
+    old_hand_positions.push_back(glm::vec4(0,0,0,0));
+    old_hand_positions.push_back(glm::vec4(0,0,0,0));
+
+    digits.push_back(0);
+    digits.push_back(0);
 }
 
 void SampleListener::onConnect(const Controller& controller) {
@@ -48,10 +54,12 @@ void SampleListener::onExit(const Controller& controller) {
 
 void SampleListener::onFrame(const Controller& controller) {
     //Set the w coord of both hands to 0
-    hand_positions[0].w = 0;
-    hand_positions[1].w = 0;
     bone_vertices.clear();
     bone_indices.clear();
+    old_hand_positions[RIGHT] = hand_positions[RIGHT];
+    old_hand_positions[LEFT] = hand_positions[LEFT];
+    hand_positions[LEFT].w = 0;
+    hand_positions[RIGHT].w = 0;
 
     // Get the most recent frame and report some basic information
     const Frame frame = controller.frame();
@@ -85,7 +93,7 @@ void SampleListener::onFrame(const Controller& controller) {
         glm::vec4 glm_pos = glm::vec4(pos.x, pos.y, pos.z, 1.0f);
 
         //add this glm::vec4 to the correct position in hand_positions
-        int index = (hand.isLeft()) ? 0 : 1;
+        int index = (hand.isLeft()) ? LEFT : RIGHT;
         hand_positions[index] = glm_pos;
 
         if(print_leap_stats)
@@ -108,6 +116,7 @@ void SampleListener::onFrame(const Controller& controller) {
         // Get fingers
         const FingerList fingers = hand.fingers();
         for (FingerList::const_iterator fl = fingers.begin(); fl != fingers.end(); ++fl) {
+            digits[index] = fingers.count();
             const Finger finger = *fl;
 
             if(print_leap_stats)
@@ -284,6 +293,10 @@ std::vector<glm::vec4> SampleListener::get_hand_positions(int width, int height)
     return transform_to_world(hand_positions, width, height);
 }
 
+std::vector<glm::vec4> SampleListener::get_old_hand_positions(int width, int height)
+{
+    return transform_to_world(old_hand_positions, width, height);
+}
 
 glm::vec4 SampleListener::convertLeapToWorld(glm::vec4 vector, int width, int height) {
     glm::vec4 world = glm::vec4(0);
