@@ -254,12 +254,6 @@ void SampleListener::onFrame(const Controller& controller) {
         }
     }
 
-    // this::drawHands(frame);
-
-    if (!frame.hands().isEmpty() || !gestures.isEmpty()) {
-        std::cout << std::endl;
-    }
-
 }
 
 void SampleListener::onFocusGained(const Controller& controller) {

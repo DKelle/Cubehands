@@ -370,9 +370,8 @@ int main(int argc, char* argv[])
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
         } else if(scale)
         {
-            printf("speed is %f ", speed);
-            float temp_speed = (direction < 0) ? -.1f : .1f;
-            //g_menger->scale(temp_speed, cube_faces, cube_vertices);
+            float temp_speed = (direction < 0) ? 1.1f : .9f;
+            g_menger->scale(cube_faces, cube_vertices, glm::vec3(0,15,0), temp_speed);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
         }
 
