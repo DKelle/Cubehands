@@ -260,7 +260,8 @@ int main(int argc, char* argv[])
 
 
                 // CHECK_GL_ERROR(glDrawElements(GL_LINES, hand_indices.size()*2, GL_UNSIGNED_INT, 0));
-
+    glm::vec3 rot;
+    glm::vec3 prev_rot;
     while (!glfwWindowShouldClose(window)) {
         // Setup some basic window stuff.
         glfwGetFramebufferSize(window, &window_width, &window_height);
@@ -348,8 +349,9 @@ int main(int argc, char* argv[])
         glm::vec3 delta_right_3 = glm::vec3(delta_right);
 
         float direction = glm::dot(delta_left_3, glm::vec3(0,1,0));
-        glm::vec3 rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
-
+        prev_rot = rot;
+        rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
+        glm::vec3 avg_rot = (rot + prev_rot) / 2.0f;
         //check that our hands were visible this fram and last frame
         bool draw_old_left = old_left.w;
         bool draw_old_right = old_right.w;
@@ -366,7 +368,7 @@ int main(int argc, char* argv[])
             printf("speed is %f and axis of rotation is ", speed);
             std::cout << glm::to_string(rot) << std::endl;
             float temp_speed = (direction < 0) ? -.1f : .1f;
-            g_menger->rotate(temp_speed, rot, cube_faces, cube_vertices);
+            g_menger->rotate(temp_speed, avg_rot, cube_faces, cube_vertices);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
         } else if(scale)
         {
