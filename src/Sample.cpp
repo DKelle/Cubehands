@@ -116,7 +116,7 @@ void SampleListener::onFrame(const Controller& controller) {
         // Get fingers
         const FingerList fingers = hand.fingers();
         for (FingerList::const_iterator fl = fingers.begin(); fl != fingers.end(); ++fl) {
-            digits[index] = fingers.count();
+            digits[index] = fingers.extended().count();
             const Finger finger = *fl;
 
             if(print_leap_stats)

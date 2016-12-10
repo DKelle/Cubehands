@@ -338,8 +338,6 @@ int main(int argc, char* argv[])
             
         }
 
-        std::cout << glm::to_string(right) << std::endl;
-
         //calculate the delta hand positions, and the axis of rotation
         std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
         glm::vec4 old_left = old_hand_pos[0];
@@ -363,8 +361,9 @@ int main(int argc, char* argv[])
 
         if(rotate)
         {
-            printf("Should be trying to rotate now");
-            g_menger->rotate(speed, rot, cube_faces, cube_vertices);
+            printf("axis of rotation is ");
+            std::cout << glm::to_string(rot) << std::endl;
+            g_menger->rotate(.05f, rot, cube_faces, cube_vertices);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
         }        
 
