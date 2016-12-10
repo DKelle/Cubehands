@@ -364,21 +364,36 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
     hand_vertices.clear();
     hand_indices.clear();
 
-    glm::vec4 left= convertLeapToWorld(hand_positions[0], SCALE_WIDTH, SCALE_HEIGHT);
+
+    int counter = 0;
+    for(int i = 0; i < bone_indices.size(); i++) {
+        glm::vec4 first_point = bone_vertices.at(bone_indices[i][0]);
+        glm::vec4 second_point = glm::vec4(0,0,0,1);
+
+        first_point = convertLeapToWorld(first_point, SCALE_WIDTH, SCALE_HEIGHT);
+        // second_point = convertLeapToWorld(second_point, SCALE_WIDTH, SCALE_HEIGHT);
+        hand_vertices.push_back(first_point);
+        hand_vertices.push_back(second_point);
+
+        hand_indices.push_back(glm::uvec2(counter, counter+1));
+        counter += 2;
+
+    }
+    // glm::vec4 left= convertLeapToWorld(hand_positions[0], SCALE_WIDTH, SCALE_HEIGHT);
     // glm::vec4 right = convertLeapToWorld(hand_positions[1], SCALE_WIDTH, SCALE_HEIGHT);
 
     //Create the new hand position vector
     // glm::vec4 left = glm::vec4(world_x_left, world_y_left, world_z_left, hand_positions[0].w);
     // glm::vec4 right = glm::vec4(world_x_right, world_y_right, world_z_right, hand_positions[1].w);
 
-    hand_vertices.push_back(glm::vec4(0,100,0,1));
-    hand_vertices.push_back(glm::vec4(0,0,0,1));
-    hand_indices.push_back(glm::uvec2(0,1));
-
-
-    // hand_vertices.push_back(right);
+    // hand_vertices.push_back(glm::vec4(0,100,0,1));
     // hand_vertices.push_back(glm::vec4(0,0,0,1));
-    // hand_indices.push_back(glm::uvec2(hand_vertices.size() - 2, hand_vertices.size() - 1));
+    // hand_indices.push_back(glm::uvec2(0,1));
+
+
+    // hand_vertices.push_back(left);
+    // hand_vertices.push_back(glm::vec4(0,0,0,1));
+    // hand_indices.push_back(glm::uvec2(0,1));
   // Leap::Frame frame = controller_.frame();
 
   // // Draw all the bones in the hands!
