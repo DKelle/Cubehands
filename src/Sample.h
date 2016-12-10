@@ -1,3 +1,7 @@
+#define LEFT 0
+#define RIGHT 1
+
+
 #include <iostream>
 #include <cstring>
 #include "Leap.h"
@@ -23,7 +27,7 @@ class SampleListener : public Listener {
     std::vector<glm::vec4> get_hand_positions(int width, int height);
     std::vector<glm::vec4> get_old_hand_positions(int width, int height);
     std::vector<glm::vec4> transform_to_world(std::vector<glm::vec4> hand_positions, int width, int height);
-
+    std::vector<int> digits;
 
   private:
     std::vector<glm::vec4> hand_positions;

@@ -146,6 +146,7 @@ int main(int argc, char* argv[])
             return &non_transparet;
     };
     
+
     //Use these definitions to send matrices to renderpass
     ShaderUniform std_model = { "model", matrix_binder, std_model_data };
     ShaderUniform floor_model = { "model", matrix_binder, floor_model_data };
@@ -178,11 +179,11 @@ int main(int argc, char* argv[])
     cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
     cube_pass_input.assign_index(cube_faces.data(), cube_faces.size(), 3);
     RenderPass cube_pass(-1,
-            cube_pass_input,
-            { vertex_shader, geometry_shader, cube_fragment_shader},
-            { std_model, std_view, std_proj, std_light },
-            { "fragment_color" }
-            );
+           cube_pass_input,
+           { vertex_shader, geometry_shader, cube_fragment_shader},
+           { std_model, std_view, std_proj, std_light },
+           { "fragment_color" }
+           );
 
     //Create the left hand 
     std::vector<glm::vec4> left_vertices;
@@ -243,6 +244,7 @@ int main(int argc, char* argv[])
         mats = gui.getMatrixPointers();
 
         int current_bone = gui.getCurrentBone();
+
 #if 1
         draw_cylinder = (current_bone != -1 && gui.isTransparent());
 #else
@@ -254,23 +256,24 @@ int main(int argc, char* argv[])
             floor_pass.setup();
             // Draw our triangles.
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, floor_faces.size() * 3, GL_UNSIGNED_INT, 0));
+
+            //also draw the centered cube
+            cube_pass.setup();
+            glDisable(GL_CULL_FACE);
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
+
         }
-        cube_pass.setup();
-
-        CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
-
+        
         //Get the current hand positions
         std::vector<glm::vec4> hand_pos = listener.get_hand_positions(100, 100);
         glm::vec4 left = hand_pos[0];
         glm::vec4 right = hand_pos[1];
         draw_left = left.w;
         draw_right = right.w;
-        std::cout << glm::to_string(right) << std::endl;
 
         //Render the left hand
         if(draw_left)
         {
-            std::cout <<"drawing left"<<std::endl;
             left_pass.setup();
             g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(left));
             left_pass.updateVBO(0, left_vertices.data(), left_vertices.size());	
@@ -280,13 +283,14 @@ int main(int argc, char* argv[])
         //Render the right hand
         if(draw_right)
         {
-            std::cout <<"Drawing right" << std::endl;
             right_pass.setup();
             g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(right));
             right_pass.updateVBO(0, right_vertices.data(), right_vertices.size());	
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_faces.size() * 3, GL_UNSIGNED_INT, 0));
             
         }
+
+        std::cout << glm::to_string(right) << std::endl;
 
         //calculate the delta hand positions, and the axis of rotation
         std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
@@ -297,16 +301,23 @@ int main(int argc, char* argv[])
         glm::vec3 delta_left_3 = glm::vec3(delta_left);
         glm::vec3 delta_right_3 = glm::vec3(delta_right);
 
-        float speed = (glm::length(delta_left_3) + glm::length(delta_right_3)) / 2;
+        float speed = (glm::length(delta_left_3) + glm::length(delta_right_3)) / 20;
         glm::vec3 rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
 
         //check that our hands were visible this fram and last frame
         bool draw_old_left = old_left.w;
         bool draw_old_right = old_right.w;
 
-        if(draw_old_left && draw_old_right && draw_right && draw_left)
+        printf("Old right is ");
+        std::cout << glm::to_string(old_right) << std::endl;
+        int left_fingers = listener.digits[LEFT];
+        int right_fingers = listener.digits[RIGHT];
+
+        if(draw_old_left && draw_old_right && draw_right && draw_left && speed > 1 && left_fingers == 0 && right_fingers == 0)
         {
             printf("Should be trying to rotate now");
+            g_menger->rotate(speed, rot, cube_faces, cube_vertices);
+            cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
         }        
 
         // Poll and swap.
