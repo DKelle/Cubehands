@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
 	bool draw_object = true;
 	bool draw_cylinder = true;
 
-	float scale_factor = 1.1f;
+	float scale_factor = 1.0f;
 	while (!glfwWindowShouldClose(window)) {
 		glEnable(GL_CULL_FACE);
 		// Setup some basic window stuff.
@@ -281,17 +281,10 @@ int main(int argc, char* argv[])
 				{ "fragment_color" }
 				);
 
-	    // cube_faces.clear();
-        g_menger->transform(cube_faces, cube_vertices, vtx_normals, glm::vec3(0.0,10.0,0.0), scale_factor);
-        scale_factor += 0.01f;
-        g_menger->rotate(0.05f, glm::vec3(0,1,1), cube_faces, cube_vertices);
-//	    glm::mat4 rotate_mat = glm::rotate(0.05f,glm::vec3(0,1,1));
-//		for (int n = 0; n < cube_vertices.size(); n++) {
-//		cube_vertices[n] = rotate_mat * cube_vertices[n];
-//	    	if (n%3 == 0) 
-//   			    cube_faces.push_back(glm::uvec3(n-3,n-2,n-1));
+        //g_menger->scale(cube_faces, cube_vertices, glm::vec3(0.0,10.0,0.0), scale_factor);
+        scale_factor += 0.00001f;
+        g_menger->rotate(0.05f, glm::vec3(0,1,1), cube_faces, cube_vertices, glm::vec3(0.0,10.0,0.0));
 
-//	    }
 		cube_pass.setup();
 		glDisable(GL_CULL_FACE);
 		CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));

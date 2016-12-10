@@ -1,5 +1,6 @@
 #include "menger.h"
 #include <glm/gtx/rotate_vector.hpp>
+#include 	<glm/gtc/matrix_transform.hpp>
 
 namespace {
     const int kMinLevel = 0;
@@ -192,24 +193,30 @@ void Menger::triangle(std::vector<glm::uvec3>& obj_faces,
     vtx_normals.push_back(normal);
 }
 
-void Menger::rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_faces,std::vector<glm::vec4>& obj_vertices) {
+void Menger::rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 origin) {
     obj_faces.clear();
+    glm::mat4 trans_mat_1 = glm::translate(-1.0f * origin);
     glm::mat4 rotate_mat = glm::rotate(speed, axis);
+    glm::mat4 trans_mat_2 = glm::translate(origin);
+
     for (int n = 0; n < obj_vertices.size(); n++) {
-	obj_vertices[n] = rotate_mat * obj_vertices[n];
+	obj_vertices[n] = trans_mat_2 * rotate_mat * trans_mat_1 * obj_vertices[n];
     	if (n%3 == 0) 
 	    obj_faces.push_back(glm::uvec3(n-3,n-2,n-1));
        }
 }
 
 
-void Menger::transform(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, std::vector<glm::vec4>& vtx_normals, glm::vec3 origin, float factor) {
+void Menger::scale(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 origin, float scale_factor) {
     obj_faces.clear();
-	obj_vertices.clear();
-	vtx_normals.clear();
-    
-    float base = 5.00f;
-    float cube_len = factor + base;
-    generate_cubes(obj_vertices, vtx_normals, obj_faces, origin.x - cube_len, origin.y - cube_len, origin.z - cube_len, 
-                                                            origin.x + cube_len, origin.y + cube_len, origin.z + factor * cube_len);
+
+    glm::mat4 trans_mat_1 = glm::translate(-1.0f * origin);
+    glm::mat4 scale_mat = glm::scale(glm::vec3(scale_factor));
+    glm::mat4 trans_mat_2 = glm::translate(origin);
+    				
+    for (int n = 0; n < obj_vertices.size(); n++) {
+    	obj_vertices[n] = trans_mat_2 * scale_mat * trans_mat_1 * obj_vertices[n];
+		if (n%3 == 0) 
+	    	obj_faces.push_back(glm::uvec3(n-3,n-2,n-1));
+    }
 }
