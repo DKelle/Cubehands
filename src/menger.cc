@@ -201,3 +201,15 @@ void Menger::rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_fa
 	    obj_faces.push_back(glm::uvec3(n-3,n-2,n-1));
        }
 }
+
+
+void Menger::transform(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, std::vector<glm::vec4>& vtx_normals, glm::vec3 origin, float factor) {
+    obj_faces.clear();
+	obj_vertices.clear();
+	vtx_normals.clear();
+    
+    float base = 5.00f;
+    float cube_len = factor + base;
+    generate_cubes(obj_vertices, vtx_normals, obj_faces, origin.x - cube_len, origin.y - cube_len, origin.z - cube_len, 
+                                                            origin.x + cube_len, origin.y + cube_len, origin.z + factor * cube_len);
+}

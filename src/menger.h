@@ -28,7 +28,8 @@ public:
                     std::vector<glm::vec4>& vtx_normals,
                     glm::vec4 normal, glm::uvec3 length,
                     int a, int b, int c) const;
-        void rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices); 
+  void rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices); 
+  void transform(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, std::vector<glm::vec4>& vtx_normals, glm::vec3 origin, float factor);
 private:
         int index = 0;
         int nesting_level_ = 0;
