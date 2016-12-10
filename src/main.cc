@@ -308,12 +308,12 @@ int main(int argc, char* argv[])
         bool draw_old_left = old_left.w;
         bool draw_old_right = old_right.w;
 
-        printf("Old right is ");
-        std::cout << glm::to_string(old_right) << std::endl;
         int left_fingers = listener.digits[LEFT];
         int right_fingers = listener.digits[RIGHT];
 
-        if(draw_old_left && draw_old_right && draw_right && draw_left && speed > 1 && left_fingers == 0 && right_fingers == 0)
+        bool rotate = draw_old_left && draw_old_right && draw_right && draw_left && left_fingers == 0 && right_fingers == 0;
+
+        if(rotate)
         {
             printf("Should be trying to rotate now");
             g_menger->rotate(speed, rot, cube_faces, cube_vertices);
