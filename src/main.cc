@@ -244,65 +244,77 @@ int main(int argc, char* argv[])
     bool draw_left;
     bool draw_right; 
 
-
     //Render the hands
-    std::vector<glm::vec4> bone_vertices;
-    std::vector<glm::uvec2> bone_indices;
-    std::vector<glm::vec4> cylinder_vertices;
-    std::vector<glm::uvec2> cylinder_indices;
+    std::vector<glm::vec4> left_cylinder_vertices;
+    std::vector<glm::uvec2> left_cylinder_indices;
+    std::vector<glm::vec4> right_cylinder_vertices;
+    std::vector<glm::uvec2> right_cylinder_indices;
     int counter = 0;
     for(int i = 0; i < 400; i ++)
     {
-        bone_vertices.push_back(glm::vec4(0,0,-1,1));
-        bone_vertices.push_back(glm::vec4(0,100,-1, 1));
-        bone_indices.push_back(glm::uvec2(counter, counter+1));
-        cylinder_vertices.push_back(glm::vec4(0,0,-1,1));
-        cylinder_vertices.push_back(glm::vec4(0,100,-1, 1));
-        cylinder_indices.push_back(glm::uvec2(counter, counter+1));
+        right_cylinder_vertices.push_back(glm::vec4(0,0,-1,1));
+        right_cylinder_vertices.push_back(glm::vec4(0,100,-1, 1));
+        right_cylinder_indices.push_back(glm::uvec2(counter, counter+1));
+        left_cylinder_vertices.push_back(glm::vec4(0,0,-1,1));
+        left_cylinder_vertices.push_back(glm::vec4(0,100,-1, 1));
+        left_cylinder_indices.push_back(glm::uvec2(counter, counter+1));
         counter += 2;
     }
     // listener.g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
 
     //Create the center cube
-    std::vector<glm::vec4> joint_vertices;
-    std::vector<glm::vec4> joint_normals;
-    std::vector<glm::uvec3> joint_faces;
+    std::vector<glm::vec4> right_joint_vertices;
+    std::vector<glm::vec4> right_joint_normals;
+    std::vector<glm::uvec3> right_joint_faces;
+    std::vector<glm::vec4> left_joint_vertices;
+    std::vector<glm::vec4> left_joint_normals;
+    std::vector<glm::uvec3> left_joint_faces;
     origin = glm::vec3(0,20,0);
-    listener.g_menger->generate_geometry(joint_vertices, joint_normals, joint_faces, origin, 1.00f);
-    origin = glm::vec3(3,20,0);
     for(int i = 0; i < 200; i ++)
     {
-        listener.g_menger->generate_geometry(joint_vertices, joint_normals, joint_faces, origin, 1.00f);
+        listener.g_menger->generate_geometry(right_joint_vertices, right_joint_normals, right_joint_faces, origin, 1.00f);
+        listener.g_menger->generate_geometry(left_joint_vertices, left_joint_normals, left_joint_faces, origin, 1.00f);
     }
 
-    RenderDataInput joint_pass_input;
-    joint_pass_input.assign(0, "vertex_position", joint_vertices.data(), joint_vertices.size(), 4, GL_FLOAT);
-    joint_pass_input.assign(1, "normal", joint_normals.data(), joint_normals.size(), 4, GL_FLOAT);
-    joint_pass_input.assign_index(joint_faces.data(), joint_faces.size(), 3);
-    RenderPass joint_pass(-1,
-           joint_pass_input,
+    //render joints
+    RenderDataInput right_joint_pass_input;
+    right_joint_pass_input.assign(0, "vertex_position", right_joint_vertices.data(), right_joint_vertices.size(), 4, GL_FLOAT);
+    right_joint_pass_input.assign(1, "normal", right_joint_normals.data(), right_joint_normals.size(), 4, GL_FLOAT);
+    right_joint_pass_input.assign_index(right_joint_faces.data(), right_joint_faces.size(), 3);
+    RenderPass right_joint_pass(-1,
+           right_joint_pass_input,
            { vertex_shader, geometry_shader, joint_fragment_shader},
            { std_model, std_view, std_proj, std_light },
            { "fragment_color" }
            );
 
+    RenderDataInput left_joint_pass_input;
+    left_joint_pass_input.assign(0, "vertex_position", left_joint_vertices.data(), left_joint_vertices.size(), 4, GL_FLOAT);
+    left_joint_pass_input.assign(1, "normal", left_joint_normals.data(), left_joint_normals.size(), 4, GL_FLOAT);
+    left_joint_pass_input.assign_index(left_joint_faces.data(), left_joint_faces.size(), 3);
+    RenderPass left_joint_pass(-1,
+           left_joint_pass_input,
+           { vertex_shader, geometry_shader, joint_fragment_shader},
+           { std_model, std_view, std_proj, std_light },
+           { "fragment_color" }
+           );
 
-    RenderDataInput bone_pass_input;
-    bone_pass_input.assign(0, "vertex_position", bone_vertices.data(), bone_vertices.size(), 4, GL_FLOAT);
-    bone_pass_input.assign_index(bone_indices.data(), bone_indices.size(), 2);
-    RenderPass bone_pass(-1,
-            bone_pass_input,
+    //Create a cylinder 
+    RenderDataInput left_cylinder_pass_input;
+    left_cylinder_pass_input.assign(0, "vertex_position", left_cylinder_vertices.data(), left_cylinder_vertices.size(), 4, GL_FLOAT);
+    left_cylinder_pass_input.assign_index(left_cylinder_indices.data(), left_cylinder_indices.size(), 2);
+    RenderPass left_cylinder_pass(-1,
+            left_cylinder_pass_input,
             { hands_vertex_shader, nullptr, hands_fragment_shader},
             { std_model, std_view, std_proj},
             { "fragment_color" }
             );
 
-    //Create a cylinder 
-    RenderDataInput cylinder_pass_input;
-    cylinder_pass_input.assign(0, "vertex_position", cylinder_vertices.data(), cylinder_vertices.size(), 4, GL_FLOAT);
-    cylinder_pass_input.assign_index(cylinder_indices.data(), cylinder_indices.size(), 2);
-    RenderPass cylinder_pass(-1,
-            cylinder_pass_input,
+    RenderDataInput right_cylinder_pass_input;
+    right_cylinder_pass_input.assign(0, "vertex_position", right_cylinder_vertices.data(), right_cylinder_vertices.size(), 4, GL_FLOAT);
+    right_cylinder_pass_input.assign_index(right_cylinder_indices.data(), right_cylinder_indices.size(), 2);
+    RenderPass right_cylinder_pass(-1,
+            right_cylinder_pass_input,
             { hands_vertex_shader, nullptr, hands_fragment_shader},
             { std_model, std_view, std_proj},
             { "fragment_color" }
@@ -369,39 +381,36 @@ int main(int argc, char* argv[])
 
         try {
 
-        if(draw_left || draw_right) {
-            // Leap::Frame frame = controller.frame();         
-            listener.drawHands(bone_vertices, bone_indices, joint_vertices, joint_faces, joint_normals, cylinder_vertices, cylinder_indices);
-            bone_pass.setup();
-            bone_pass.updateVBO(0, bone_vertices.data(), bone_vertices.size());
-            //joint_pass.updateVBO(0, joint_vertices.data(), joint_vertices.size());
+        if(draw_left) {
+            listener.drawHands(left_joint_vertices, left_joint_faces, left_joint_normals, left_cylinder_vertices, left_cylinder_indices, LEFT);
 
-            CHECK_GL_ERROR(glDrawElements(GL_LINES, bone_indices.size()*2, GL_UNSIGNED_INT, 0));
+            //draw cubes at joint on left hands
+            left_joint_pass.setup();
+            left_joint_pass.updateVBO(0, left_joint_vertices.data(), left_joint_vertices.size());
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
 
-            //draw cubes at joints
-            joint_pass.setup();
-            joint_pass.updateVBO(0, joint_vertices.data(), joint_vertices.size());
-            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
-            
-            //draw cylinders for fingers
-            cylinder_pass.setup();
-            cylinder_pass.updateVBO(0, cylinder_vertices.data(), cylinder_vertices.size());
+            //draw cylinders for fingers on left hands
+            left_cylinder_pass.setup();
+            left_cylinder_pass.updateVBO(0, left_cylinder_vertices.data(), left_cylinder_vertices.size());
+            CHECK_GL_ERROR(glDrawElements(GL_LINES, left_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
 
-            CHECK_GL_ERROR(glDrawElements(GL_LINES, cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
-        }  
-        if(draw_left && !draw_right || (!draw_left && draw_right)){
+        }
+        if(draw_right)
+        {
+            listener.drawHands(right_joint_vertices, right_joint_faces, right_joint_normals, right_cylinder_vertices, right_cylinder_indices, RIGHT);
 
-            bone_vertices.clear();
-            bone_indices.clear();
-            joint_vertices.clear();
-            joint_faces.clear();
-            joint_normals.clear();
-            cylinder_vertices.clear();
-            cylinder_indices.clear();
+            //draw cubes at joints on right hand
+            right_joint_pass.setup();
+            right_joint_pass.updateVBO(0, right_joint_vertices.data(), right_joint_vertices.size());
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
 
-            CHECK_GL_ERROR(glDrawElements(GL_LINES, bone_indices.size()*2, GL_UNSIGNED_INT, 0));
-            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
-            CHECK_GL_ERROR(glDrawElements(GL_LINES, cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
+            //draw cylinders for fingers on left hands
+            right_cylinder_pass.setup();
+            right_cylinder_pass.updateVBO(0, right_cylinder_vertices.data(), right_cylinder_vertices.size());
+            CHECK_GL_ERROR(glDrawElements(GL_LINES, right_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
+        }
+        if(draw_right || draw_left)
+        {
         }
         //calculate the delta hand positions, and the axis of rotation
         // std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
