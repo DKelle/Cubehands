@@ -399,7 +399,6 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
     joint_normals.clear();
     cylinder_vertices.clear();
     cylinder_indices.clear();
-    glm::vec4 origin;
 
     int counter = 0;
     for(int i = 0; i < bone_indices.size(); i++) {
@@ -428,8 +427,6 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
                 try{
                     first_point = convertLeapToWorld(first_point, SCALE_WIDTH, SCALE_HEIGHT);
                     second_point = convertLeapToWorld(second_point, SCALE_WIDTH, SCALE_HEIGHT);
-                    origin = second_point;
-                    origin1 = first_point;
                 } catch(const std::out_of_range& e) {
                     printf("converting to leap %d\n", i);
                     hand_vertices.clear();
@@ -443,10 +440,10 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
                 try {
                     hand_vertices.push_back(first_point);
                     hand_vertices.push_back(second_point);
-                    g_menger->generate_geometry(joint_vertices, joint_normals, joint_indices, origin, .75f);
+                    g_menger->generate_geometry(joint_vertices, joint_normals, joint_indices, second_point, .75f);
 
                     hand_indices.push_back(glm::uvec2(counter, counter+1));
-                    g_menger->create_cylinder(cylinder_vertices, cylinder_indices, origin1, origin);
+                    g_menger->create_cylinder(cylinder_vertices, cylinder_indices, first_point, second_point);
                     counter += 2;
                 }
                 catch(const std::out_of_range& e) {
