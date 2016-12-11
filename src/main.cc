@@ -84,7 +84,7 @@ GLFWwindow* init_glefw()
     return ret;
 }
 
-std::shared_ptr<Menger> g_menger;
+//std::shared_ptr<Menger> listener.g_menger;
 
 int main(int argc, char* argv[])
 {
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     std::vector<glm::uvec3> floor_faces;
     create_floor(floor_vertices, floor_faces);
 
-    // g_menger->fill_origin();
+    // listener.g_menger->fill_origin();
 
     glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
     MatrixPointers mats; // Define MatrixPointers here for lambda to capture
@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
     std::vector<glm::vec4> vtx_normals;
     std::vector<glm::uvec3> cube_faces;
     glm::vec3 origin = glm::vec3(0,15,0);
-    g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, origin);
+    listener.g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, origin, 5.00f);
 
     RenderDataInput cube_pass_input;
     cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
     // std::vector<glm::vec4> left_vertices;
     // std::vector<glm::vec4> left_normals;
     // std::vector<glm::uvec3> left_faces;
-    // g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(0.0,15.0,0.0));
+    // listener.g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(0.0,15.0,0.0));
 
     // RenderDataInput left_pass_input;
     // left_pass_input.assign(0, "vertex_position", left_vertices.data(), left_vertices.size(), 4, GL_FLOAT);
@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
     // std::vector<glm::vec4> right_vertices;
     // std::vector<glm::vec4> right_normals;
     // std::vector<glm::uvec3> right_faces;
-    // g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
+    // listener.g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
 
     // RenderDataInput right_pass_input;
     // right_pass_input.assign(0, "vertex_position", right_vertices.data(), right_vertices.size(), 4, GL_FLOAT);
@@ -237,32 +237,55 @@ int main(int argc, char* argv[])
     bool draw_right; 
 
 
-    //Render the right hand    
-    std::vector<glm::vec4> hand_vertices;
-    std::vector<glm::uvec2> hand_indices;
+    //Render the hands
+    std::vector<glm::vec4> bone_vertices;
+    std::vector<glm::uvec2> bone_indices;
     int counter = 0;
     for(int i = 0; i < 400; i ++)
     {
-        hand_vertices.push_back(glm::vec4(0,0,-1,1));
-        hand_vertices.push_back(glm::vec4(0,100,-1, 1));
-        hand_indices.push_back(glm::uvec2(counter, counter+1));
+        bone_vertices.push_back(glm::vec4(0,0,-1,1));
+        bone_vertices.push_back(glm::vec4(0,100,-1, 1));
+        bone_indices.push_back(glm::uvec2(counter, counter+1));
         counter += 2;
     }
-    // g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
+    // listener.g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
 
-    RenderDataInput hand_pass_input;
-    hand_pass_input.assign(0, "vertex_position", hand_vertices.data(), hand_vertices.size(), 4, GL_FLOAT);
-    // right_pass_input.assign(1, "normal", right_normals.data(), right_normals.size(), 4, GL_FLOAT);
-    hand_pass_input.assign_index(hand_indices.data(), hand_indices.size(), 2);
-    RenderPass hands_pass(-1,
-            hand_pass_input,
+    //Create the center cube
+    std::vector<glm::vec4> joint_vertices;
+    std::vector<glm::vec4> joint_normals;
+    std::vector<glm::uvec3> joint_faces;
+    origin = glm::vec3(0,20,0);
+    listener.g_menger->generate_geometry(joint_vertices, joint_normals, joint_faces, origin, 1.00f);
+    origin = glm::vec3(3,20,0);
+    for(int i = 0; i < 200; i ++)
+    {
+        listener.g_menger->generate_geometry(joint_vertices, joint_normals, joint_faces, origin, 1.00f);
+    }
+
+    RenderDataInput joint_pass_input;
+    joint_pass_input.assign(0, "vertex_position", joint_vertices.data(), joint_vertices.size(), 4, GL_FLOAT);
+    joint_pass_input.assign(1, "normal", joint_normals.data(), joint_normals.size(), 4, GL_FLOAT);
+    joint_pass_input.assign_index(joint_faces.data(), joint_faces.size(), 3);
+    RenderPass joint_pass(-1,
+           joint_pass_input,
+           { vertex_shader, geometry_shader, cube_fragment_shader},
+           { std_model, std_view, std_proj, std_light },
+           { "fragment_color" }
+           );
+
+
+    RenderDataInput bone_pass_input;
+    bone_pass_input.assign(0, "vertex_position", bone_vertices.data(), bone_vertices.size(), 4, GL_FLOAT);
+    bone_pass_input.assign_index(bone_indices.data(), bone_indices.size(), 2);
+    RenderPass bone_pass(-1,
+            bone_pass_input,
             { hands_vertex_shader, nullptr, hands_fragment_shader},
             { std_model, std_view, std_proj},
             { "fragment_color" }
             );
 
+    //Create the center cube
 
-                // CHECK_GL_ERROR(glDrawElements(GL_LINES, hand_indices.size()*2, GL_UNSIGNED_INT, 0));
     glm::vec3 rot;
     glm::vec3 prev_rot;
     while (!glfwWindowShouldClose(window)) {
@@ -311,23 +334,26 @@ int main(int argc, char* argv[])
         draw_right = right.w;
 
         if(draw_left || draw_right) {
-
-
             // Leap::Frame frame = controller.frame();         
-            listener.drawHands(hand_vertices, hand_indices);
-            hands_pass.setup();
-            hands_pass.updateVBO(0, hand_vertices.data(), hand_vertices.size());
+            listener.drawHands(bone_vertices, bone_indices, joint_vertices, joint_faces, joint_normals);
+            printf("joints has %d vertices \n", joint_vertices.size());
+            bone_pass.setup();
+            bone_pass.updateVBO(0, bone_vertices.data(), bone_vertices.size());
+            //joint_pass.updateVBO(0, joint_vertices.data(), joint_vertices.size());
 
-            CHECK_GL_ERROR(glDrawElements(GL_LINES, hand_indices.size()*2, GL_UNSIGNED_INT, 0));
-            // CHECK_GL_ERROR(glDrawElements(GL_LINES, bone_indices .size() * 2, GL_UNSIGNED_INT, 0));         
+            CHECK_GL_ERROR(glDrawElements(GL_LINES, bone_indices.size()*2, GL_UNSIGNED_INT, 0));
 
+            //draw cubes at joints
+            joint_pass.setup();
+            joint_pass.updateVBO(0, joint_vertices.data(), joint_vertices.size());
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
         }
 
         //Render the left hand
         // if(draw_left)
         // {
         //     left_pass.setup();
-        //     g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(left));
+        //     listener.g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(left));
         //     left_pass.updateVBO(0, left_vertices.data(), left_vertices.size());	
         //     //CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_faces.size() * 3, GL_UNSIGNED_INT, 0));
             
@@ -336,8 +362,8 @@ int main(int argc, char* argv[])
         // if(draw_right)
         // {
         //     right_pass.setup();
-        //     g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(right));
-        //     right_pass.updateVBO(0, right_vertices.data(), right_vertices.size());	
+        //     listener.g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(right));
+        //     right_pass.nupdateVBO(0, right_vertices.data(), right_vertices.size());	
         //     //CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_faces.size() * 3, GL_UNSIGNED_INT, 0));
             
         // }
@@ -370,24 +396,25 @@ int main(int argc, char* argv[])
         bool scale = (draw_right && listener.scale_prob[RIGHT] > 0.9);
 
 
+        //rotate
         if(draw_left && left_fingers == 0) {
-            g_menger->rotate(listener.rotation_matrices[LEFT], cube_faces, cube_vertices, origin);
+            listener.g_menger->rotate(listener.rotation_matrices[LEFT], cube_faces, cube_vertices, origin);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
             cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
         } 
         // else if(scale) {
         //     // float temp_speed = (direction < 0) ? 1.1f : .9f;
         //     float temp_speed = listener.scale_factor[RIGHT];
-        //     g_menger->scale(cube_faces, cube_vertices, origin, temp_speed);
+        //     listener.g_menger->scale(cube_faces, cube_vertices, origin, temp_speed);
         //     cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
         // }
 
-        // use pointable??
+        //translate 
         if(draw_right && listener.pointable_list[RIGHT].count() == 1) {
-            // NEED the order of the multiplication
+            //NEED the order of the multiplication
             glm::vec3 translation = glm::vec3(listener.translation_vectors[RIGHT]) * 0.1f;
             origin = translation + origin;
-            g_menger->translate(cube_faces, cube_vertices, translation);
+            listener.g_menger->translate(cube_faces, cube_vertices, translation);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
             cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
         }
@@ -397,7 +424,7 @@ int main(int argc, char* argv[])
         // if(rotate)
         // {
         //     float temp_speed = (direction < 0) ? -.1f : .1f;
-        //     // g_menger->rotate(temp_speed, avg_rot, cube_faces, cube_vertices, glm::vec3(0,15,0));
+        //     // listener.g_menger->rotate(temp_speed, avg_rot, cube_faces, cube_vertices, glm::vec3(0,15,0));
         //     // cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
         //     // cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
         // } else if(scale)

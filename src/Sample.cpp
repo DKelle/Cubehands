@@ -389,15 +389,20 @@ std::vector<glm::vec4> SampleListener::transform_to_world(std::vector<glm::vec4>
 
 // void SampleListener::drawHands(std::vector<glm::vec4>& bone_vertices, std::vector<glm::uvec2>& bone_indices) {
 void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices, 
-    std::vector<glm::uvec2>& hand_indices) {
+    std::vector<glm::uvec2>& hand_indices, std::vector<glm::vec4>& joint_vertices, std::vector<glm::uvec3>& joint_indices, std::vector<glm::vec4>& joint_normals) {
 
     hand_vertices.clear();
     hand_indices.clear();
-
+    joint_vertices.clear();
+    joint_indices.clear();
+    joint_normals.clear();
+    glm::vec4 origin;
+    glm::vec4 origin1;
 
     int counter = 0;
     for(int i = 0; i < bone_indices.size(); i++) {
 
+        //Create the bones
         if(bone_indices[i][0] >= bone_vertices.size() || bone_indices[i][1] >= bone_vertices.size())
             return;
         glm::vec4 first_point = bone_vertices.at(bone_indices[i][0]);
@@ -408,10 +413,17 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
         hand_vertices.push_back(first_point);
         hand_vertices.push_back(second_point);
 
+        origin = second_point;
+        origin1 = first_point;
+
         hand_indices.push_back(glm::uvec2(counter, counter+1));
         counter += 2;
 
+        g_menger->generate_geometry(joint_vertices, joint_normals, joint_indices, origin, .75f);
+        //create a cube at each joint
+
     }
+    
     // glm::vec4 left= convertLeapToWorld(hand_positions[0], SCALE_WIDTH, SCALE_HEIGHT);
     // glm::vec4 right = convertLeapToWorld(hand_positions[1], SCALE_WIDTH, SCALE_HEIGHT);
 

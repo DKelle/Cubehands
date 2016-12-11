@@ -49,20 +49,20 @@ void
 Menger::generate_geometry(std::vector<glm::vec4>& obj_vertices,
                           std::vector<glm::vec4>& vtx_normals,
                           std::vector<glm::uvec3>& obj_faces,
-                          glm::vec3 origin) const
+                          glm::vec3 origin, float size) const
 {
-    obj_vertices.clear();
-    obj_faces.clear();
-    vtx_normals.clear();
 
+//    obj_vertices.clear();
+//    vtx_normals.clear();
+//    obj_faces.clear();
     // if (nesting_level_ == 0) {
     //    drawCube(obj_vertices, obj_faces, vtx_normals,
     //             -0.50f, -0.50f, -0.50f, 0.50f, 0.50f, 0.50f);
     // }
     // else {
     // printf("origin: %f, %f, %f", origin_.x, origin_.y, origin_.z);
-        generate_cubes(obj_vertices, vtx_normals, obj_faces, origin.x - 5.00f, origin.y - 5.00f, origin.z - 5.00f, 
-                                                            origin.x + 5.00f, origin.y + 5.00f, origin.z + 5.00f);
+        generate_cubes(obj_vertices, vtx_normals, obj_faces, origin.x - size, origin.y - size, origin.z - size, 
+                                                            origin.x + size, origin.y + size, origin.z + size);
     // }
 }
 
@@ -104,6 +104,7 @@ void Menger::drawCube(std::vector<glm::vec4>& obj_vertices,
                       double minx, double miny, double minz,
                       double maxx, double maxy, double maxz) const
 {
+    int count = obj_vertices.size();
     glm::uvec3 length(obj_faces.size(), obj_faces.size(), obj_faces.size());
     // front
     glm::vec4 front_norm(0.0f, 0.0f, 1.0f, 0.0f);
@@ -112,13 +113,15 @@ void Menger::drawCube(std::vector<glm::vec4>& obj_vertices,
     obj_vertices.push_back(glm::vec4(maxx, miny, maxz, 1.0f));
     obj_vertices.push_back(glm::vec4(maxx, maxy, maxz, 1.0f));
 
-    triangle(obj_faces, vtx_normals, front_norm, length, 0, 1, 2);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 
     obj_vertices.push_back(glm::vec4(maxx, maxy, maxz, 1.0f));
     obj_vertices.push_back(glm::vec4(minx, maxy, maxz, 1.0f));
     obj_vertices.push_back(glm::vec4(minx, miny, maxz, 1.0f));
     
-    triangle(obj_faces, vtx_normals, front_norm, length, 3, 4, 5);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 
     // right
     glm::vec4 right_norm(1.0f, 0.0f, 0.0f, 0.0f);
@@ -127,13 +130,15 @@ void Menger::drawCube(std::vector<glm::vec4>& obj_vertices,
     obj_vertices.push_back(glm::vec4(maxx, miny, minz, 1.0f));
     obj_vertices.push_back(glm::vec4(maxx, maxy, minz, 1.0f)); 
 
-    triangle(obj_faces, vtx_normals, right_norm, length, 6, 7, 8);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 
     obj_vertices.push_back(glm::vec4(maxx, maxy, minz, 1.0f)); 
     obj_vertices.push_back(glm::vec4(maxx, maxy, maxz, 1.0f));
     obj_vertices.push_back(glm::vec4(maxx, miny, maxz, 1.0f));
 
-    triangle(obj_faces, vtx_normals, right_norm, length, 9, 10, 11);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
     
     // back
     glm::vec4 back_norm(0.0f, 0.0f, -1.0f, 0.0f);
@@ -142,13 +147,15 @@ void Menger::drawCube(std::vector<glm::vec4>& obj_vertices,
     obj_vertices.push_back(glm::vec4(maxx, miny, minz, 1.0f));
     obj_vertices.push_back(glm::vec4(maxx, maxy, minz, 1.0f)); 
 
-    triangle(obj_faces, vtx_normals, back_norm, length, 12, 13, 14);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 
     obj_vertices.push_back(glm::vec4(maxx, maxy, minz, 1.0f)); 
     obj_vertices.push_back(glm::vec4(minx, maxy, minz, 1.0f));
     obj_vertices.push_back(glm::vec4(minx, miny, minz, 1.0f));
 
-    triangle(obj_faces, vtx_normals, back_norm, length, 15, 16, 17);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 
     // left
     glm::vec4 left_norm(-1.0f, 0.0f, 0.0f, 0.0f);
@@ -157,13 +164,15 @@ void Menger::drawCube(std::vector<glm::vec4>& obj_vertices,
     obj_vertices.push_back(glm::vec4(minx, miny, minz, 1.0f));
     obj_vertices.push_back(glm::vec4(minx, maxy, minz, 1.0f)); 
 
-    triangle(obj_faces, vtx_normals, left_norm, length, 18, 19, 20);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 
     obj_vertices.push_back(glm::vec4(minx, maxy, maxz, 1.0f));
     obj_vertices.push_back(glm::vec4(minx, maxy, minz, 1.0f)); 
     obj_vertices.push_back(glm::vec4(minx, miny, maxz, 1.0f));
   
-    triangle(obj_faces, vtx_normals, left_norm, length, 21, 22, 23);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 
     // top
     glm::vec4 top_norm(0.0f, 1.0f, 0.0f, 0.0f);
@@ -172,13 +181,15 @@ void Menger::drawCube(std::vector<glm::vec4>& obj_vertices,
     obj_vertices.push_back(glm::vec4(maxx, maxy, maxz, 1.0f));
     obj_vertices.push_back(glm::vec4(maxx, maxy, minz, 1.0f));
 
-    triangle(obj_faces, vtx_normals, top_norm, length, 24, 25, 26);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 
     obj_vertices.push_back(glm::vec4(maxx, maxy, minz, 1.0f));
     obj_vertices.push_back(glm::vec4(minx, maxy, minz, 1.0f));
     obj_vertices.push_back(glm::vec4(minx, maxy, maxz, 1.0f));
 
-    triangle(obj_faces, vtx_normals, top_norm, length, 27, 28, 29);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 
     // bot
     glm::vec4 bot_norm(0.0f, -1.0f, 0.0f, 0.0f);
@@ -187,13 +198,15 @@ void Menger::drawCube(std::vector<glm::vec4>& obj_vertices,
     obj_vertices.push_back(glm::vec4(maxx, miny, maxz, 1.0f));
     obj_vertices.push_back(glm::vec4(maxx, miny, minz, 1.0f)); 
 
-    triangle(obj_faces, vtx_normals, bot_norm, length, 30, 31, 32);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 
     obj_vertices.push_back(glm::vec4(maxx, miny, minz, 1.0f)); 
     obj_vertices.push_back(glm::vec4(minx, miny, minz, 1.0f));
     obj_vertices.push_back(glm::vec4(minx, miny, maxz, 1.0f));
 
-    triangle(obj_faces, vtx_normals, bot_norm, length, 33, 34, 35);
+    triangle(obj_faces, vtx_normals, front_norm, length, count+0, count+1, count+2);
+    count += 3;
 }
 
 void Menger::triangle(std::vector<glm::uvec3>& obj_faces,

@@ -15,7 +15,7 @@ public:
     void generate_geometry(std::vector<glm::vec4>& obj_vertices,
                    std::vector<glm::vec4>& vtx_normals,
                            std::vector<glm::uvec3>& obj_faces,
-                           glm::vec3 origin) const;
+                           glm::vec3 origin, float size) const;
     void generate_cubes(std::vector<glm::vec4>& obj_vertices,
                             std::vector<glm::vec4>& vtx_normals,
                             std::vector<glm::uvec3>& obj_faces,
