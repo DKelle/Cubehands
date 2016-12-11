@@ -33,6 +33,12 @@ void SampleListener::onInit(const Controller& controller) {
 
     rotation_matrices.push_back(glm::mat4(0));
     rotation_matrices.push_back(glm::mat4(0));
+
+    translation_vectors.push_back(glm::vec4(0));
+    translation_vectors.push_back(glm::vec4(0));
+
+    pointable_list.push_back(Leap::PointableList());
+    pointable_list.push_back(Leap::PointableList());
 }
 
 void SampleListener::onConnect(const Controller& controller) {
@@ -101,6 +107,8 @@ void SampleListener::onFrame(const Controller& controller) {
         int index = (hand.isLeft()) ? LEFT : RIGHT;
         hand_positions[index] = glm_pos;
         rotation_matrices[index] = hand.rotationMatrix(controller.frame(1)).toMatrix4x4<glm::mat4>();
+        translation_vectors[index] = hand.translation(controller.frame(1)).toVector4<glm::vec4>();
+        pointable_list[index] = hand.pointables().extended();
 
         if(print_leap_stats)
         {

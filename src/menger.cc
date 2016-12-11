@@ -10,7 +10,16 @@ namespace {
 Menger::Menger()
 {
     // Add additional initialization if you like
+    // origin_ = glm::vec3(0,15, 0);
 }
+
+// void Menger::fill_origin() {
+//     printf("filling origin\n");
+//     origin_ = glm::vec3(0,15,0);
+//         // origin_ = glm::vec3(0,15,0);
+//     printf("post origin\n");
+
+// }
 
 Menger::~Menger()
 {
@@ -51,6 +60,7 @@ Menger::generate_geometry(std::vector<glm::vec4>& obj_vertices,
     //             -0.50f, -0.50f, -0.50f, 0.50f, 0.50f, 0.50f);
     // }
     // else {
+    // printf("origin: %f, %f, %f", origin_.x, origin_.y, origin_.z);
         generate_cubes(obj_vertices, vtx_normals, obj_faces, origin.x - 5.00f, origin.y - 5.00f, origin.z - 5.00f, 
                                                             origin.x + 5.00f, origin.y + 5.00f, origin.z + 5.00f);
     // }
@@ -243,3 +253,17 @@ void Menger::scale(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& o
 	    	obj_faces.push_back(glm::uvec3(n-3,n-2,n-1));
     }
 }
+
+
+void Menger::translate(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 translated) {
+    obj_faces.clear();
+
+    glm::mat4 trans_mat_1 = glm::translate(translated);
+                    
+    for (int n = 0; n < obj_vertices.size(); n++) {
+        obj_vertices[n] = trans_mat_1 * obj_vertices[n];
+        if (n%3 == 0) 
+            obj_faces.push_back(glm::uvec3(n-3,n-2,n-1));
+    }
+}
+

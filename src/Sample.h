@@ -38,6 +38,8 @@ class SampleListener : public Listener {
     const float SCALE_WIDTH = 100;
     const float SCALE_HEIGHT = 100;
     std::vector<glm::mat4> rotation_matrices;
+    std::vector<glm::vec4> translation_vectors;
+    std::vector<Leap::PointableList> pointable_list;
 
   private:
     std::vector<glm::vec4> hand_positions;

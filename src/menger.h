@@ -11,6 +11,7 @@ public:
     void set_nesting_level(int);
     bool is_dirty() const;
     void set_clean();
+    // void fill_origin();
     void generate_geometry(std::vector<glm::vec4>& obj_vertices,
                    std::vector<glm::vec4>& vtx_normals,
                            std::vector<glm::uvec3>& obj_faces,
@@ -33,9 +34,13 @@ public:
     glm::vec3 origin);
 
   void scale(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 origin, float scale_factor);
+  void translate(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 translated);
+
+      // glm::vec3 origin_;
+
 private:
-        int index = 0;
-        int nesting_level_ = 0;
+    int index = 0;
+    int nesting_level_ = 0;
     bool dirty_ = false;
 };
 

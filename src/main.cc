@@ -101,6 +101,8 @@ int main(int argc, char* argv[])
     std::vector<glm::uvec3> floor_faces;
     create_floor(floor_vertices, floor_faces);
 
+    // g_menger->fill_origin();
+
     glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
     MatrixPointers mats; // Define MatrixPointers here for lambda to capture
     /*
@@ -179,7 +181,8 @@ int main(int argc, char* argv[])
     std::vector<glm::vec4> cube_vertices;
     std::vector<glm::vec4> vtx_normals;
     std::vector<glm::uvec3> cube_faces;
-    g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, glm::vec3(0.0,15.0,0.0));
+    glm::vec3 origin = glm::vec3(0,15,0);
+    g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, origin);
 
     RenderDataInput cube_pass_input;
     cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
@@ -192,39 +195,39 @@ int main(int argc, char* argv[])
            { "fragment_color" }
            );
 
-    //Create the left hand 
-    std::vector<glm::vec4> left_vertices;
-    std::vector<glm::vec4> left_normals;
-    std::vector<glm::uvec3> left_faces;
-    g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(0.0,15.0,0.0));
+    // //Create the left hand 
+    // std::vector<glm::vec4> left_vertices;
+    // std::vector<glm::vec4> left_normals;
+    // std::vector<glm::uvec3> left_faces;
+    // g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(0.0,15.0,0.0));
 
-    RenderDataInput left_pass_input;
-    left_pass_input.assign(0, "vertex_position", left_vertices.data(), left_vertices.size(), 4, GL_FLOAT);
-    left_pass_input.assign(1, "normal", left_normals.data(), left_normals.size(), 4, GL_FLOAT);
-    left_pass_input.assign_index(left_faces.data(), left_faces.size(), 3);
-    RenderPass left_pass(-1,
-            left_pass_input,
-            { vertex_shader, geometry_shader, cube_fragment_shader},
-            { std_model, std_view, std_proj, std_light },
-            { "fragment_color" }
-            );
+    // RenderDataInput left_pass_input;
+    // left_pass_input.assign(0, "vertex_position", left_vertices.data(), left_vertices.size(), 4, GL_FLOAT);
+    // left_pass_input.assign(1, "normal", left_normals.data(), left_normals.size(), 4, GL_FLOAT);
+    // left_pass_input.assign_index(left_faces.data(), left_faces.size(), 3);
+    // RenderPass left_pass(-1,
+    //         left_pass_input,
+    //         { vertex_shader, geometry_shader, cube_fragment_shader},
+    //         { std_model, std_view, std_proj, std_light },
+    //         { "fragment_color" }
+    //         );
 
-    //Create the right hande
-    std::vector<glm::vec4> right_vertices;
-    std::vector<glm::vec4> right_normals;
-    std::vector<glm::uvec3> right_faces;
-    g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
+    // //Create the right hande
+    // std::vector<glm::vec4> right_vertices;
+    // std::vector<glm::vec4> right_normals;
+    // std::vector<glm::uvec3> right_faces;
+    // g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
 
-    RenderDataInput right_pass_input;
-    right_pass_input.assign(0, "vertex_position", right_vertices.data(), right_vertices.size(), 4, GL_FLOAT);
-    right_pass_input.assign(1, "normal", right_normals.data(), right_normals.size(), 4, GL_FLOAT);
-    right_pass_input.assign_index(right_faces.data(), right_faces.size(), 3);
-    RenderPass right_pass(-1,
-            right_pass_input,
-            { vertex_shader, geometry_shader, cube_fragment_shader},
-            { std_model, std_view, std_proj, std_light },
-            { "fragment_color" }
-            );
+    // RenderDataInput right_pass_input;
+    // right_pass_input.assign(0, "vertex_position", right_vertices.data(), right_vertices.size(), 4, GL_FLOAT);
+    // right_pass_input.assign(1, "normal", right_normals.data(), right_normals.size(), 4, GL_FLOAT);
+    // right_pass_input.assign_index(right_faces.data(), right_faces.size(), 3);
+    // RenderPass right_pass(-1,
+    //         right_pass_input,
+    //         { vertex_shader, geometry_shader, cube_fragment_shader},
+    //         { std_model, std_view, std_proj, std_light },
+    //         { "fragment_color" }
+    //         );
 
     bool draw_floor = true;
     bool draw_skeleton = true;
@@ -321,23 +324,23 @@ int main(int argc, char* argv[])
         }
 
         //Render the left hand
-        if(draw_left)
-        {
-            left_pass.setup();
-            g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(left));
-            left_pass.updateVBO(0, left_vertices.data(), left_vertices.size());	
-            //CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_faces.size() * 3, GL_UNSIGNED_INT, 0));
+        // if(draw_left)
+        // {
+        //     left_pass.setup();
+        //     g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(left));
+        //     left_pass.updateVBO(0, left_vertices.data(), left_vertices.size());	
+        //     //CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_faces.size() * 3, GL_UNSIGNED_INT, 0));
             
-        }
-        //Render the right hand
-        if(draw_right)
-        {
-            right_pass.setup();
-            g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(right));
-            right_pass.updateVBO(0, right_vertices.data(), right_vertices.size());	
-            //CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_faces.size() * 3, GL_UNSIGNED_INT, 0));
+        // }
+        // //Render the right hand
+        // if(draw_right)
+        // {
+        //     right_pass.setup();
+        //     g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(right));
+        //     right_pass.updateVBO(0, right_vertices.data(), right_vertices.size());	
+        //     //CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_faces.size() * 3, GL_UNSIGNED_INT, 0));
             
-        }
+        // }
 
         //calculate the delta hand positions, and the axis of rotation
         std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
@@ -365,7 +368,17 @@ int main(int argc, char* argv[])
 
 
         if(draw_left && left_fingers == 0) {
-            g_menger->rotate(listener.rotation_matrices[LEFT], cube_faces, cube_vertices, glm::vec3(0,15,0));
+            g_menger->rotate(listener.rotation_matrices[LEFT], cube_faces, cube_vertices, origin);
+            cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+            cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+        }
+
+        // use pointable??
+        if(draw_right && listener.pointable_list[RIGHT].count() == 1) {
+            // NEED the order of the multiplication
+            glm::vec3 translation = glm::vec3(listener.translation_vectors[RIGHT]) * 0.1f;
+            origin = translation + origin;
+            g_menger->translate(cube_faces, cube_vertices, translation);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
             cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
         }
