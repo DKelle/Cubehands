@@ -374,12 +374,13 @@ int main(int argc, char* argv[])
             g_menger->rotate(listener.rotation_matrices[LEFT], cube_faces, cube_vertices, origin);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
             cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
-        } else if(scale) {
-            // float temp_speed = (direction < 0) ? 1.1f : .9f;
-            float temp_speed = listener.scale_factor[RIGHT];
-            g_menger->scale(cube_faces, cube_vertices, origin, temp_speed);
-            cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
-        }
+        } 
+        // else if(scale) {
+        //     // float temp_speed = (direction < 0) ? 1.1f : .9f;
+        //     float temp_speed = listener.scale_factor[RIGHT];
+        //     g_menger->scale(cube_faces, cube_vertices, origin, temp_speed);
+        //     cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+        // }
 
         // use pointable??
         if(draw_right && listener.pointable_list[RIGHT].count() == 1) {
