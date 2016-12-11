@@ -29,6 +29,9 @@ public:
                     glm::vec4 normal, glm::uvec3 length,
                     int a, int b, int c) const;
   void rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 origin); 
+  void rotate(glm::mat4 rotation_matrix, std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices,
+    glm::vec3 origin);
+
   void scale(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 origin, float scale_factor);
 private:
         int index = 0;

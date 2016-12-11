@@ -30,6 +30,9 @@ void SampleListener::onInit(const Controller& controller) {
 
     digits.push_back(0);
     digits.push_back(0);
+
+    rotation_matrices.push_back(glm::mat4(0));
+    rotation_matrices.push_back(glm::mat4(0));
 }
 
 void SampleListener::onConnect(const Controller& controller) {
@@ -60,6 +63,8 @@ void SampleListener::onFrame(const Controller& controller) {
     old_hand_positions[LEFT] = hand_positions[LEFT];
     hand_positions[LEFT].w = 0;
     hand_positions[RIGHT].w = 0;
+    rotation_matrices[LEFT] = glm::mat4(0);
+    rotation_matrices[RIGHT] = glm::mat4(0);
 
     // Get the most recent frame and report some basic information
     const Frame frame = controller.frame();
@@ -95,6 +100,7 @@ void SampleListener::onFrame(const Controller& controller) {
         //add this glm::vec4 to the correct position in hand_positions
         int index = (hand.isLeft()) ? LEFT : RIGHT;
         hand_positions[index] = glm_pos;
+        rotation_matrices[index] = hand.rotationMatrix(controller.frame(1)).toMatrix4x4<glm::mat4>();
 
         if(print_leap_stats)
         {
@@ -117,6 +123,7 @@ void SampleListener::onFrame(const Controller& controller) {
         const FingerList fingers = hand.fingers();
         for (FingerList::const_iterator fl = fingers.begin(); fl != fingers.end(); ++fl) {
             digits[index] = fingers.extended().count();
+
             const Finger finger = *fl;
 
             if(print_leap_stats)

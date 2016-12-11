@@ -37,7 +37,7 @@ class SampleListener : public Listener {
     const float LEAP_MAX = 600;
     const float SCALE_WIDTH = 100;
     const float SCALE_HEIGHT = 100;
-
+    std::vector<glm::mat4> rotation_matrices;
 
   private:
     std::vector<glm::vec4> hand_positions;
