@@ -240,12 +240,17 @@ int main(int argc, char* argv[])
     //Render the hands
     std::vector<glm::vec4> bone_vertices;
     std::vector<glm::uvec2> bone_indices;
+    std::vector<glm::vec4> cylinder_vertices;
+    std::vector<glm::uvec2> cylinder_indices;
     int counter = 0;
     for(int i = 0; i < 400; i ++)
     {
         bone_vertices.push_back(glm::vec4(0,0,-1,1));
         bone_vertices.push_back(glm::vec4(0,100,-1, 1));
         bone_indices.push_back(glm::uvec2(counter, counter+1));
+        cylinder_vertices.push_back(glm::vec4(0,0,-1,1));
+        cylinder_vertices.push_back(glm::vec4(0,100,-1, 1));
+        cylinder_indices.push_back(glm::uvec2(counter, counter+1));
         counter += 2;
     }
     // listener.g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
@@ -284,7 +289,17 @@ int main(int argc, char* argv[])
             { "fragment_color" }
             );
 
-    //Create the center cube
+    //Create a cylinder 
+    RenderDataInput cylinder_pass_input;
+    cylinder_pass_input.assign(0, "vertex_position", cylinder_vertices.data(), cylinder_vertices.size(), 4, GL_FLOAT);
+    cylinder_pass_input.assign_index(cylinder_indices.data(), cylinder_indices.size(), 2);
+    RenderPass cylinder_pass(-1,
+            cylinder_pass_input,
+            { hands_vertex_shader, nullptr, hands_fragment_shader},
+            { std_model, std_view, std_proj},
+            { "fragment_color" }
+            );
+    //listener.g_menger->create_cylinder(cylinder_vertices, cylinder_indices, glm::vec4(0,0,0,1), glm::vec4(0,1,0,1));
 
     glm::vec3 rot;
     glm::vec3 prev_rot;
@@ -335,7 +350,7 @@ int main(int argc, char* argv[])
 
         if(draw_left || draw_right) {
             // Leap::Frame frame = controller.frame();         
-            listener.drawHands(bone_vertices, bone_indices, joint_vertices, joint_faces, joint_normals);
+            listener.drawHands(bone_vertices, bone_indices, joint_vertices, joint_faces, joint_normals, cylinder_vertices, cylinder_indices);
             printf("joints has %d vertices \n", joint_vertices.size());
             bone_pass.setup();
             bone_pass.updateVBO(0, bone_vertices.data(), bone_vertices.size());
@@ -347,6 +362,12 @@ int main(int argc, char* argv[])
             joint_pass.setup();
             joint_pass.updateVBO(0, joint_vertices.data(), joint_vertices.size());
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
+            
+            //draw cylinders for fingers
+            cylinder_pass.setup();
+            cylinder_pass.updateVBO(0, cylinder_vertices.data(), cylinder_vertices.size());
+
+            CHECK_GL_ERROR(glDrawElements(GL_LINES, cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
         }
 
         //calculate the delta hand positions, and the axis of rotation

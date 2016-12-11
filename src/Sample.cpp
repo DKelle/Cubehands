@@ -383,13 +383,16 @@ std::vector<glm::vec4> SampleListener::transform_to_world(std::vector<glm::vec4>
 
 // void SampleListener::drawHands(std::vector<glm::vec4>& bone_vertices, std::vector<glm::uvec2>& bone_indices) {
 void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices, 
-    std::vector<glm::uvec2>& hand_indices, std::vector<glm::vec4>& joint_vertices, std::vector<glm::uvec3>& joint_indices, std::vector<glm::vec4>& joint_normals) {
+    std::vector<glm::uvec2>& hand_indices, std::vector<glm::vec4>& joint_vertices, std::vector<glm::uvec3>& joint_indices, std::vector<glm::vec4>& joint_normals,
+    std::vector<glm::vec4>& cylinder_vertices, std::vector<glm::uvec2>& cylinder_indices) {
 
     hand_vertices.clear();
     hand_indices.clear();
     joint_vertices.clear();
     joint_indices.clear();
     joint_normals.clear();
+    cylinder_vertices.clear();
+    cylinder_indices.clear();
     glm::vec4 origin;
     glm::vec4 origin1;
 
@@ -417,6 +420,7 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
                     first_point = convertLeapToWorld(first_point, SCALE_WIDTH, SCALE_HEIGHT);
                     second_point = convertLeapToWorld(second_point, SCALE_WIDTH, SCALE_HEIGHT);
                     origin = second_point;
+                    origin1 = first_point;
                 } catch(const std::out_of_range& e) {
                     printf("converting to leap %d\n", i);
                     std::cout << e.what() << std::endl;
@@ -429,6 +433,7 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
                     g_menger->generate_geometry(joint_vertices, joint_normals, joint_indices, origin, .75f);
 
                     hand_indices.push_back(glm::uvec2(counter, counter+1));
+                    g_menger->create_cylinder(cylinder_vertices, cylinder_indices, origin1, origin);
                     counter += 2;
                 }
                 catch(const std::out_of_range& e) {
@@ -455,6 +460,7 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
         //create a cube at each joint
 
     }
+
     
     // glm::vec4 left= convertLeapToWorld(hand_positions[0], SCALE_WIDTH, SCALE_HEIGHT);
     // glm::vec4 right = convertLeapToWorld(hand_positions[1], SCALE_WIDTH, SCALE_HEIGHT);

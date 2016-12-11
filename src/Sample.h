@@ -28,7 +28,8 @@ class SampleListener : public Listener {
     std::vector<glm::vec4> get_old_hand_positions(int width, int height);
     std::vector<glm::vec4> transform_to_world(std::vector<glm::vec4> hand_positions, int width, int height);
     void drawBone(const Leap::Bone& bone, std::vector<glm::vec4>& bone_vertices,std::vector<glm::uvec2>& bone_indices);
-    void drawHands(std::vector<glm::vec4>& bone_vertices, std::vector<glm::uvec2>& bone_indices, std::vector<glm::vec4>& joint_vertices, std::vector<glm::uvec3>& joint_indices, std::vector<glm::vec4>& joint_normals);
+    void drawHands(std::vector<glm::vec4>& bone_vertices, std::vector<glm::uvec2>& bone_indices, std::vector<glm::vec4>& joint_vertices, std::vector<glm::uvec3>& joint_indices, std::vector<glm::vec4>& joint_normals,
+            std::vector<glm::vec4>& cylinder_vertices, std::vector<glm::uvec2>& cylinder_faces);
     glm::vec4 convertLeapToWorld(glm::vec4 vector, int width, int height);
     std::vector<int> digits;
     std::shared_ptr<Menger> g_menger;
