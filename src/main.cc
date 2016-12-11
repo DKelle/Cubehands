@@ -23,6 +23,7 @@
 #include <debuggl.h>
 
 int window_width = 800, window_height = 600;
+
 const std::string window_title = "Skinning";
 
 const char* vertex_shader =
@@ -53,6 +54,7 @@ const char* hands_fragment_shader =
 #include "shaders/hands.frag"
 ;
 
+bool reset = false;
 // FIXME: Add more shaders here.
 
 void ErrorCallback(int error, const char* description) {
@@ -80,7 +82,6 @@ GLFWwindow* init_glefw()
     const GLubyte* version = glGetString(GL_VERSION);    // version as a string
     std::cout << "Renderer: " << renderer << "\n";
     std::cout << "OpenGL version supported:" << version << "\n";
-
     return ret;
 }
 
@@ -89,6 +90,8 @@ GLFWwindow* init_glefw()
 int main(int argc, char* argv[])
 {
     GLFWwindow *window = init_glefw();
+
+
     SampleListener listener;
     Controller controller;
 
@@ -182,6 +185,7 @@ int main(int argc, char* argv[])
     std::vector<glm::vec4> vtx_normals;
     std::vector<glm::uvec3> cube_faces;
     glm::vec3 origin = glm::vec3(0,15,0);
+    glm::vec3 original_origin = origin;
     listener.g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, origin, 5.00f);
 
     RenderDataInput cube_pass_input;
@@ -340,6 +344,17 @@ int main(int argc, char* argv[])
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
 
         }
+
+        // if(listener.reset) {
+        //     cube_vertices.clear();
+        //     vtx_normals.clear();
+        //     cube_faces.clear();
+        //     origin = original_origin;
+        //     listener.g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, original_origin, 5.00f);
+        //     listener.reset = false;
+        // }
+
+
         
         //Get the current hand positions
         std::vector<glm::vec4> hand_pos = listener.get_hand_positions(100, 100);
@@ -348,10 +363,11 @@ int main(int argc, char* argv[])
         draw_left = left.w;
         draw_right = right.w;
 
+        try {
+
         if(draw_left || draw_right) {
             // Leap::Frame frame = controller.frame();         
             listener.drawHands(bone_vertices, bone_indices, joint_vertices, joint_faces, joint_normals, cylinder_vertices, cylinder_indices);
-            printf("joints has %d vertices \n", joint_vertices.size());
             bone_pass.setup();
             bone_pass.updateVBO(0, bone_vertices.data(), bone_vertices.size());
             //joint_pass.updateVBO(0, joint_vertices.data(), joint_vertices.size());
@@ -387,7 +403,6 @@ int main(int argc, char* argv[])
         // bool draw_old_left = old_left.w;
         // bool draw_old_right = old_right.w;
 
-        try {
             int left_fingers = listener.digits.at(LEFT);
             int right_fingers = listener.digits.at(RIGHT);
 
@@ -396,7 +411,8 @@ int main(int argc, char* argv[])
             // bool scale = speed > .6 && left_fingers == 5 && right_fingers == 5 && draw_old_left && draw_old_right && draw_left && draw_right;
             // printf("scaled: %f, %f\n", listener.scale_prob[LEFT], listener.scale_prob[RIGHT]);
             // bool scale = (draw_left && listener.scale_prob[LEFT] > 0.9) || (draw_right && listener.scale_prob[RIGHT] > 0.9);
-            bool scale = (draw_right && listener.scale_prob.at(RIGHT) > 0.9);
+            // bool scale = (draw_right && listener.scale_prob.at(RIGHT) > 0.9);
+            bool scale = (draw_left && left_fingers == 5) && (draw_right && listener.scale_prob.at(RIGHT) > 0.9);
 
 
             if(draw_left && left_fingers == 0) {
@@ -439,6 +455,17 @@ int main(int argc, char* argv[])
                 cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
             }
         // }
+
+            if(gui.reset) {
+                cube_vertices.clear();
+                vtx_normals.clear();
+                cube_faces.clear();
+                origin = original_origin;
+                listener.g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, original_origin, 5.00f);
+                cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+                cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+                gui.reset = false;
+            }
 
         } catch(const std::out_of_range& e) {
             printf("error in main\n");

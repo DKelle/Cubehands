@@ -45,6 +45,7 @@ class SampleListener : public Listener {
     std::vector<float> scale_prob;
     std::vector<float> scale_factor;
 
+    // bool reset = false;
 
   private:
     std::vector<glm::vec4> hand_positions;
