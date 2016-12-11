@@ -328,8 +328,8 @@ int main(int argc, char* argv[])
         
         //Get the current hand positions
         std::vector<glm::vec4> hand_pos = listener.get_hand_positions(100, 100);
-        glm::vec4 left = hand_pos[0];
-        glm::vec4 right = hand_pos[1];
+        glm::vec4 left = hand_pos.at(0);
+        glm::vec4 right = hand_pos.at(1);
         draw_left = left.w;
         draw_right = right.w;
 
@@ -349,88 +349,80 @@ int main(int argc, char* argv[])
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
         }
 
-        //Render the left hand
-        // if(draw_left)
-        // {
-        //     left_pass.setup();
-        //     listener.g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(left));
-        //     left_pass.updateVBO(0, left_vertices.data(), left_vertices.size());	
-        //     //CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_faces.size() * 3, GL_UNSIGNED_INT, 0));
-            
-        // }
-        // //Render the right hand
-        // if(draw_right)
-        // {
-        //     right_pass.setup();
-        //     listener.g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(right));
-        //     right_pass.nupdateVBO(0, right_vertices.data(), right_vertices.size());	
-        //     //CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_faces.size() * 3, GL_UNSIGNED_INT, 0));
-            
-        // }
-
         //calculate the delta hand positions, and the axis of rotation
-        std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
-        glm::vec4 old_left = old_hand_pos[0];
-        glm::vec4 old_right = old_hand_pos[1];
-        glm::vec4 delta_left = old_left - left;
-        glm::vec4 delta_right = old_right - right;
-        glm::vec3 delta_left_3 = glm::vec3(delta_left);
-        glm::vec3 delta_right_3 = glm::vec3(delta_right);
+        // std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
+        // glm::vec4 old_left = old_hand_pos[0];
+        // glm::vec4 old_right = old_hand_pos[1];
+        // glm::vec4 delta_left = old_left - left;
+        // glm::vec4 delta_right = old_right - right;
+        // glm::vec3 delta_left_3 = glm::vec3(delta_left);
+        // glm::vec3 delta_right_3 = glm::vec3(delta_right);
 
-        float direction = glm::dot(delta_left_3, glm::vec3(0,1,0));
-        prev_rot = rot;
-        rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
-        glm::vec3 avg_rot = (rot + prev_rot) / 2.0f;
-        //check that our hands were visible this fram and last frame
-        bool draw_old_left = old_left.w;
-        bool draw_old_right = old_right.w;
+        // float direction = glm::dot(delta_left_3, glm::vec3(0,1,0));
+        // prev_rot = rot;
+        // rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
+        // glm::vec3 avg_rot = (rot + prev_rot) / 2.0f;
+        // //check that our hands were visible this fram and last frame
+        // bool draw_old_left = old_left.w;
+        // bool draw_old_right = old_right.w;
 
-        int left_fingers = listener.digits[LEFT];
-        int right_fingers = listener.digits[RIGHT];
+        try {
+            int left_fingers = listener.digits.at(LEFT);
+            int right_fingers = listener.digits.at(RIGHT);
 
-        float speed = (glm::length(delta_left_3) + glm::length(delta_right_3))/2;
-        bool rotate = speed > .5 && draw_old_left && draw_old_right && draw_right && draw_left && left_fingers == 0 && right_fingers == 0;
-        // bool scale = speed > .6 && left_fingers == 5 && right_fingers == 5 && draw_old_left && draw_old_right && draw_left && draw_right;
-        // printf("scaled: %f, %f\n", listener.scale_prob[LEFT], listener.scale_prob[RIGHT]);
-        // bool scale = (draw_left && listener.scale_prob[LEFT] > 0.9) || (draw_right && listener.scale_prob[RIGHT] > 0.9);
-        bool scale = (draw_right && listener.scale_prob[RIGHT] > 0.9);
+            // float speed = (glm::length(delta_left_3) + glm::length(delta_right_3))/2;
+            // bool rotate = speed > .5 && draw_old_left && draw_old_right && draw_right && draw_left && left_fingers == 0 && right_fingers == 0;
+            // bool scale = speed > .6 && left_fingers == 5 && right_fingers == 5 && draw_old_left && draw_old_right && draw_left && draw_right;
+            // printf("scaled: %f, %f\n", listener.scale_prob[LEFT], listener.scale_prob[RIGHT]);
+            // bool scale = (draw_left && listener.scale_prob[LEFT] > 0.9) || (draw_right && listener.scale_prob[RIGHT] > 0.9);
+            bool scale = (draw_right && listener.scale_prob.at(RIGHT) > 0.9);
 
 
-        //rotate
-        if(draw_left && left_fingers == 0) {
-            listener.g_menger->rotate(listener.rotation_matrices[LEFT], cube_faces, cube_vertices, origin);
-            cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
-            cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
-        } 
-        // else if(scale) {
-        //     // float temp_speed = (direction < 0) ? 1.1f : .9f;
-        //     float temp_speed = listener.scale_factor[RIGHT];
-        //     listener.g_menger->scale(cube_faces, cube_vertices, origin, temp_speed);
-        //     cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+            if(draw_left && left_fingers == 0) {
+                listener.g_menger->rotate(listener.rotation_matrices.at(LEFT), cube_faces, cube_vertices, origin);
+                cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+                cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+            } 
+            // else if(scale) {
+            //     // float temp_speed = (direction < 0) ? 1.1f : .9f;
+            //     float temp_speed = listener.scale_factor[RIGHT];
+            //     g_menger->scale(cube_faces, cube_vertices, origin, temp_speed);
+            //     cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+            // }
+
+            // use pointable??
+            if(draw_right && listener.pointable_list.at(RIGHT).count() == 1) {
+                // NEED the order of the multiplication
+                glm::vec3 translation = glm::vec3(listener.translation_vectors.at(RIGHT)) * 0.1f;
+                origin = translation + origin;
+                listener.g_menger->translate(cube_faces, cube_vertices, translation);
+                cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+                cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+            }
+
+            // if(draw_left && draw_right && )
+
+            // if(rotate)
+            // {
+            //     float temp_speed = (direction < 0) ? -.1f : .1f;
+            //     // g_menger->rotate(temp_speed, avg_rot, cube_faces, cube_vertices, glm::vec3(0,15,0));
+            //     // cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+            //     // cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+            // } else if(scale)
+            // {
+
+            if(scale) {
+                // float temp_speed = (direction < 0) ? 1.1f : .9f;
+                float temp_speed = listener.scale_factor.at(RIGHT);
+                listener.g_menger->scale(cube_faces, cube_vertices, origin, temp_speed);
+                cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+            }
         // }
 
-        //translate 
-        if(draw_right && listener.pointable_list[RIGHT].count() == 1) {
-            //NEED the order of the multiplication
-            glm::vec3 translation = glm::vec3(listener.translation_vectors[RIGHT]) * 0.1f;
-            origin = translation + origin;
-            listener.g_menger->translate(cube_faces, cube_vertices, translation);
-            cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
-            cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+        } catch(const std::out_of_range& e) {
+            printf("error in main\n");
+            exit(0);
         }
-
-        // if(draw_left && draw_right && )
-
-        // if(rotate)
-        // {
-        //     float temp_speed = (direction < 0) ? -.1f : .1f;
-        //     // listener.g_menger->rotate(temp_speed, avg_rot, cube_faces, cube_vertices, glm::vec3(0,15,0));
-        //     // cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
-        //     // cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
-        // } else if(scale)
-        // {
-
-        // }
 
         // Poll and swap.
         glfwPollEvents();
