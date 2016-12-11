@@ -19,9 +19,9 @@ float rand(vec2 co){
 void main() {
 	vec3 texcolor = texture(textureSampler, uv_coords).xyz;
 	if (length(texcolor) == 0.0) {
-		//vec3 color = vec3(0.0, 1.0, 0.0);
+		vec3 color = vec3(0.0, 1.0, 0.0);
 		//vec3 color = vec3(diffuse);
-		vec3 color = vec3(diffuse);
+		//vec3 color = vec3(diffuse);
 		//vec2 randuv = vec2(rand(light_direction.xy), rand(light_direction.zw));
 		//vec3 color = vec3(diffuse) + texture(textureSampler, randuv).xyz;
 		//vec3 color = texture(textureSampler, randuv).xyz;

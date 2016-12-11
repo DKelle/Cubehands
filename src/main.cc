@@ -43,6 +43,15 @@ const char* cube_fragment_shader =
 #include "shaders/cube.frag"
 ;
 
+const char* line_vertex_shader =
+#include "shaders/line.vert"
+;
+
+const char* line_fragment_shader =
+#include "shaders/line.frag"
+;
+
+
 // FIXME: Add more shaders here.
 
 void ErrorCallback(int error, const char* description) {
@@ -111,6 +120,7 @@ int main(int argc, char* argv[])
 
 	Mesh mesh;
 	mesh.loadpmd(argv[1]);
+	std::cout << "argv[1]" << argv[1] << std::endl;
 	std::cout << "Loaded object  with  " << mesh.vertices.size()
 		<< " vertices and " << mesh.faces.size() << " faces.\n";
 
@@ -230,7 +240,12 @@ int main(int argc, char* argv[])
 	std::vector<glm::vec4> cube_vertices;
 	std::vector<glm::vec4> vtx_normals;
 	std::vector<glm::uvec3> cube_faces;
-	g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, glm::vec3(0.0,10.0,0.0));
+	g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, glm::vec3(0.0f, 10.0f, 0.0f));
+
+	std::vector<glm::vec4> line_vertices;
+	std::vector<glm::vec4> line_vtx_normals;
+	std::vector<glm::uvec3> line_faces;
+	g_menger->generate_outer_geometry(line_vertices, line_vtx_normals, line_faces, glm::vec3(0.0f, 10.0f, 0.0f));
 
 	bool draw_floor = true;
 	bool draw_skeleton = true;
@@ -238,6 +253,9 @@ int main(int argc, char* argv[])
 	bool draw_cylinder = true;
 
 	float scale_factor = 1.0f;
+	float rIntensity = 0.0;
+	float gIntensity = 0.0;
+	bool reverse = false;
 	while (!glfwWindowShouldClose(window)) {
 		glEnable(GL_CULL_FACE);
 		// Setup some basic window stuff.
@@ -270,27 +288,90 @@ int main(int argc, char* argv[])
 			CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, floor_faces.size() * 3, GL_UNSIGNED_INT, 0));
 		}
 
+		glm::vec4 colorC = glm::vec4(rIntensity, gIntensity, 0.0f, 1.0f);
+		
+		auto color_data = [&colorC]() -> const void* {
+			return &colorC;
+		};
+		rIntensity += 0.01f;
+		gIntensity += 0.0055f;
+		// intensity -= 0.01f;
+		ShaderUniform color = { "colorC", vector_binder, color_data };
+
+		RenderDataInput line_pass_input;
+		line_pass_input.assign(0, "vertex_position", line_vertices.data(), line_vertices.size(), 4, GL_FLOAT);
+		line_pass_input.assign(1, "normal", line_vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+		line_pass_input.assign_index(line_faces.data(), line_faces.size(), 3);
+		RenderPass line_pass(-1,
+				line_pass_input,
+				{ vertex_shader, geometry_shader, line_fragment_shader},
+				{ std_model, std_view, std_proj, std_light, color },
+				{ "fragment_color" }
+				);
+
+
 		RenderDataInput cube_pass_input;
 		cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
 		cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
 		cube_pass_input.assign_index(cube_faces.data(), cube_faces.size(), 3);
+		cube_pass_input.useMaterials(mesh.materials);
+		glm::vec3 diffuse;
+		glm::vec3 ambient;
+		glm::vec3 specular;
+		float shininess;
+		for (int h = 3; h < 4; h++) {
+			auto& ma = mesh.materials.at(h);
+			
+			diffuse += ma.diffuse[0];
+			ambient += ma.ambient[0];
+			specular += ma.specular[0];
+			shininess += ma.shininess;
+			std::cout << "ambient: " << ambient.x << " " << ambient.y << " " << ambient.z << std::endl;
+
+		}
+		std::vector<glm::vec4> components;
+		components.push_back(glm::vec4(diffuse,0.0));
+		components.push_back(glm::vec4(ambient,0.0));
+		components.push_back(glm::vec4(specular,0.0));
+		std::cout << "components[0]: " << components[0].x << " " << components[0].y << " " << components[0].z << std::endl;
+
+		std::vector<float> shini;
+		shini.push_back(shininess);
+		auto diffuse_data = [&components]() -> const void* {
+			return &components[0];
+		};
+		auto ambient_data = [&components]() -> const void* {
+			return &components[1];
+		};
+		auto specular_data = [&components]() -> const void* {
+			return &components[2];
+		};	
+		auto shininess_data = [&shini]() -> const void* {
+			return &shini[0];
+		};
+		
+		ShaderUniform std_diffuse = { "diffuse", vector_binder, diffuse_data };
+		ShaderUniform std_ambience = { "ambient", vector_binder, ambient_data };
+		ShaderUniform std_specular = { "specular", vector_binder, specular_data };
+		ShaderUniform std_shininess = { "shininess", float_binder , shininess_data };
+
 		RenderPass cube_pass(-1,
 				cube_pass_input,
 				{ vertex_shader, geometry_shader, cube_fragment_shader},
-				{ std_model, std_view, std_proj, std_light },
+				{ std_model, std_view, std_proj, std_light, std_camera, object_alpha, std_diffuse, std_ambience, std_specular, std_shininess  },
 				{ "fragment_color" }
 				);
-
-        //g_menger->scale(cube_faces, cube_vertices, glm::vec3(0.0,10.0,0.0), scale_factor);
+        g_menger->scale(cube_faces, cube_vertices, glm::vec3(0.0,10.0,0.0), scale_factor);
         scale_factor += 0.00001f;
         g_menger->rotate(0.05f, glm::vec3(0,1,1), cube_faces, cube_vertices, glm::vec3(0.0,10.0,0.0));
+        g_menger->rotate_lines(0.05f, glm::vec3(0,1,1), line_faces, line_vertices, glm::vec3(0.0,10.0,0.0));
 
 		cube_pass.setup();
 		glDisable(GL_CULL_FACE);
 		CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
 	
-	    
-	 
+	    line_pass.setup();
+		CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, line_faces.size() * 3, GL_UNSIGNED_INT, 0));
 
 		// Poll and swap.
 		glfwPollEvents();

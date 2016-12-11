@@ -30,10 +30,15 @@ public:
                     int a, int b, int c) const;
   void rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 origin); 
   void scale(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 origin, float scale_factor);
+
+  void generate_outer_geometry(std::vector<glm::vec4>& line_vertices, std::vector<glm::vec4>& vtx_normals, std::vector<glm::uvec3>& line_faces, glm::vec3 origin) const;
+  void rotate_lines(float speed, glm::vec3 axis, std::vector<glm::uvec3>& line_faces, std::vector<glm::vec4>& line_vertices, glm::vec3 origin); 
+
 private:
         int index = 0;
         int nesting_level_ = 0;
 	bool dirty_ = false;
+
 };
 
 #endif
