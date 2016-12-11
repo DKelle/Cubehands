@@ -225,7 +225,11 @@ void Menger::rotate(float speed, glm::vec3 axis, std::vector<glm::uvec3>& obj_fa
 
 void Menger::rotate(glm::mat4 rotation_matrix, std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices,
         glm::vec3 origin) {
+    if(rotation_matrix == glm::mat4(0)) {
+        return;
+    }
     obj_faces.clear();
+
     glm::mat4 trans_mat_1 = glm::translate(-1.0f * origin);
     glm::mat4 trans_mat_2 = glm::translate(origin);
     glm::vec3 cur_normal;
@@ -241,6 +245,9 @@ void Menger::rotate(glm::mat4 rotation_matrix, std::vector<glm::uvec3>& obj_face
 
 
 void Menger::scale(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 origin, float scale_factor) {
+    if(scale_factor == 0) {
+        return;
+    }
     obj_faces.clear();
 
     glm::mat4 trans_mat_1 = glm::translate(-1.0f * origin);

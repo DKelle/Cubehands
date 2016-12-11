@@ -164,14 +164,8 @@ void SampleListener::onFrame(const Controller& controller) {
 
                 glm::vec4 start = bone.prevJoint().toVector4<glm::vec4>();
                 start.w = 1;
-                // std::cout << "pre Start bone leap: " << glm::to_string(start) << std::endl;
-                // start = convertLeapToWorld(start, width, height);
                 glm::vec4 end = bone.nextJoint().toVector4<glm::vec4>();
                 end.w = 1;
-                // end = convertLeapToWorld(end, width, height);
-                // std::cout << "Start bone world: " << glm::to_string(start) << std::endl;
-                // printf("hand positions: \n");
-                // std::cout << glm::to_string(hand_positions[0]) << std::endl;
 
                 bone_vertices.push_back(start);
                 bone_vertices.push_back(end);
@@ -394,22 +388,63 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
     hand_vertices.clear();
     hand_indices.clear();
 
-
     int counter = 0;
     for(int i = 0; i < bone_indices.size(); i++) {
 
-        if(bone_indices[i][0] >= bone_vertices.size() || bone_indices[i][1] >= bone_vertices.size())
-            return;
-        glm::vec4 first_point = bone_vertices.at(bone_indices[i][0]);
-        glm::vec4 second_point = bone_vertices.at(bone_indices[i][1]);
+        // if(bone_indices.at(i).at(0) >= bone_vertices.size() || bone_indices[i][1] >= bone_vertices.size())
+        //     return;s
+        int first_index = bone_indices.at(i)[0];
+        int second_index = bone_indices.at(i)[1];
+        try {
+            if(first_index < 0 || second_index < 0 || first_index >= bone_vertices.size() 
+                    || second_index >= bone_vertices.size()) {
+                printf("corrupt indices");
+                hand_vertices.clear();
+                hand_indices.clear();
+                return;
+            }
 
-        first_point = convertLeapToWorld(first_point, SCALE_WIDTH, SCALE_HEIGHT);
-        second_point = convertLeapToWorld(second_point, SCALE_WIDTH, SCALE_HEIGHT);
-        hand_vertices.push_back(first_point);
-        hand_vertices.push_back(second_point);
+            try {
+                glm::vec4 first_point = bone_vertices.at(first_index);
+                glm::vec4 second_point = bone_vertices.at(second_index);
+            
 
-        hand_indices.push_back(glm::uvec2(counter, counter+1));
-        counter += 2;
+                try{
+                    first_point = convertLeapToWorld(first_point, SCALE_WIDTH, SCALE_HEIGHT);
+                    second_point = convertLeapToWorld(second_point, SCALE_WIDTH, SCALE_HEIGHT);
+                } catch(const std::out_of_range& e) {
+                    printf("converting to leap %d\n", i);
+                    std::cout << e.what() << std::endl;
+                    exit(0);            
+                }
+
+                try {
+                    hand_vertices.push_back(first_point);
+                    hand_vertices.push_back(second_point);
+
+                    hand_indices.push_back(glm::uvec2(counter, counter+1));
+                    counter += 2;
+                }
+                catch(const std::out_of_range& e) {
+                    printf("in pushing the vertices on hands %d\n", i);
+                    std::cout << e.what() << std::endl;
+                    exit(0);            
+                }
+            }
+
+            catch (const std::out_of_range& e) {
+                            printf("retrieving the point: %d, %d, size: %lu\n", first_index, second_index, bone_vertices.size());
+                            printf("corrupt indices");
+                            hand_vertices.clear();
+                            hand_indices.clear();
+                            exit(-1);
+                        }
+
+        } catch(const std::out_of_range& e) {
+            printf("in draw hands %d\n", i);
+            std::cout << e.what() << std::endl;
+            exit(0);            
+        }
 
     }
     // glm::vec4 left= convertLeapToWorld(hand_positions[0], SCALE_WIDTH, SCALE_HEIGHT);
