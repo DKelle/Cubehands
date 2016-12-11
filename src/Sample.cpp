@@ -193,7 +193,9 @@ void SampleListener::onFrame(const Controller& controller) {
 
         switch (gesture.type()) {
             case Gesture::TYPE_CIRCLE:
-            {
+            {                
+                // printf("Circle gesture\n");
+
                 CircleGesture circle = gesture;
                 std::string clockwiseness;
 
@@ -223,6 +225,9 @@ void SampleListener::onFrame(const Controller& controller) {
             }
             case Gesture::TYPE_SWIPE:
             {
+                // reset = true;s
+
+
                 SwipeGesture swipe = gesture;
                 if(print_leap_stats)
                 {
@@ -379,7 +384,8 @@ std::vector<glm::vec4> SampleListener::transform_to_world(std::vector<glm::vec4>
 
 
 
-// }
+// }.
+
 
 // void SampleListener::drawHands(std::vector<glm::vec4>& bone_vertices, std::vector<glm::uvec2>& bone_indices) {
 void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices, 
@@ -391,21 +397,24 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
     joint_indices.clear();
     joint_normals.clear();
     glm::vec4 origin;
-    glm::vec4 origin1;
 
     int counter = 0;
     for(int i = 0; i < bone_indices.size(); i++) {
 
         // if(bone_indices.at(i).at(0) >= bone_vertices.size() || bone_indices[i][1] >= bone_vertices.size())
         //     return;s
-        int first_index = bone_indices.at(i)[0];
-        int second_index = bone_indices.at(i)[1];
+
         try {
+            int first_index = bone_indices.at(i)[0];
+            int second_index = bone_indices.at(i)[1];
             if(first_index < 0 || second_index < 0 || first_index >= bone_vertices.size() 
                     || second_index >= bone_vertices.size()) {
                 printf("corrupt indices");
                 hand_vertices.clear();
                 hand_indices.clear();
+                joint_vertices.clear();
+                joint_indices.clear();
+                joint_normals.clear();
                 return;
             }
 
@@ -419,8 +428,12 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
                     origin = second_point;
                 } catch(const std::out_of_range& e) {
                     printf("converting to leap %d\n", i);
-                    std::cout << e.what() << std::endl;
-                    exit(0);            
+                    hand_vertices.clear();
+                    hand_indices.clear();
+                    joint_vertices.clear();
+                    joint_indices.clear();
+                    joint_normals.clear();
+                    return;  
                 }
 
                 try {
@@ -434,23 +447,33 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
                 catch(const std::out_of_range& e) {
                     printf("in pushing the vertices on hands %d\n", i);
                     std::cout << e.what() << std::endl;
-                    exit(0);            
+                    hand_vertices.clear();
+                    hand_indices.clear();
+                    joint_vertices.clear();
+                    joint_indices.clear();
+                    joint_normals.clear();
+                    return;  
                 }
             }
 
             catch (const std::out_of_range& e) {
                             printf("retrieving the point: %d, %d, size: %lu\n", first_index, second_index, bone_vertices.size());
                             printf("corrupt indices");
-                            hand_vertices.clear();
-                            hand_indices.clear();
-                            exit(-1);
+                           hand_vertices.clear();
+                           hand_indices.clear();
+                           joint_vertices.clear();
+                           joint_indices.clear();
+                           joint_normals.clear();
+                           return; 
                         }
 
         } catch(const std::out_of_range& e) {
-            printf("in draw hands %d\n", i);
-            std::cout << e.what() << std::endl;
-            exit(0);            
-        }
+            hand_vertices.clear();
+            hand_indices.clear();
+            joint_vertices.clear();
+            joint_indices.clear();
+            joint_normals.clear();
+            return;        }
 
         //create a cube at each joint
 

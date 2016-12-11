@@ -46,6 +46,12 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		//FIXME save out a screenshot using SaveJPEG
 	}
 
+	if (key == GLFW_KEY_R && action == GLFW_RELEASE) {
+		//FIXME save out a screenshot using SaveJPEG
+		reset = true;
+	}
+
+
 	if (captureWASDUPDOWN(key, action))
 		return ;
 	if (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT) {

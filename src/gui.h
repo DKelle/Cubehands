@@ -40,11 +40,15 @@ public:
 	bool setCurrentBone(int i);
 
 	bool isTransparent() const { return transparent_; }
+
+	bool reset = false;
+
 private:
 	GLFWwindow* window_;
 	Mesh* mesh_;
 
 	int window_width_, window_height_;
+
 
 	bool drag_state_ = false;
 	bool fps_mode_ = false;
