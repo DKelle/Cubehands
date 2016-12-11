@@ -46,6 +46,10 @@ const char* cube_fragment_shader =
 #include "shaders/cube.frag"
 ;
 
+const char* joint_fragment_shader =
+#include "shaders/joint.frag"
+;
+
 const char* hands_vertex_shader = 
 #include "shaders/hands.vert"
 ;
@@ -277,7 +281,7 @@ int main(int argc, char* argv[])
     joint_pass_input.assign_index(joint_faces.data(), joint_faces.size(), 3);
     RenderPass joint_pass(-1,
            joint_pass_input,
-           { vertex_shader, geometry_shader, cube_fragment_shader},
+           { vertex_shader, geometry_shader, joint_fragment_shader},
            { std_model, std_view, std_proj, std_light },
            { "fragment_color" }
            );
@@ -384,8 +388,21 @@ int main(int argc, char* argv[])
             cylinder_pass.updateVBO(0, cylinder_vertices.data(), cylinder_vertices.size());
 
             CHECK_GL_ERROR(glDrawElements(GL_LINES, cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
-        }
+        }  
+        if(draw_left && !draw_right || (!draw_left && draw_right)){
 
+            bone_vertices.clear();
+            bone_indices.clear();
+            joint_vertices.clear();
+            joint_faces.clear();
+            joint_normals.clear();
+            cylinder_vertices.clear();
+            cylinder_indices.clear();
+
+            CHECK_GL_ERROR(glDrawElements(GL_LINES, bone_indices.size()*2, GL_UNSIGNED_INT, 0));
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
+            CHECK_GL_ERROR(glDrawElements(GL_LINES, cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
+        }
         //calculate the delta hand positions, and the axis of rotation
         // std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
         // glm::vec4 old_left = old_hand_pos[0];
