@@ -39,6 +39,12 @@ void SampleListener::onInit(const Controller& controller) {
 
     pointable_list.push_back(Leap::PointableList());
     pointable_list.push_back(Leap::PointableList());
+
+    scale_prob.push_back(0);
+    scale_prob.push_back(0);
+
+    scale_factor.push_back(0);
+    scale_factor.push_back(0);
 }
 
 void SampleListener::onConnect(const Controller& controller) {
@@ -109,6 +115,8 @@ void SampleListener::onFrame(const Controller& controller) {
         rotation_matrices[index] = hand.rotationMatrix(controller.frame(1)).toMatrix4x4<glm::mat4>();
         translation_vectors[index] = hand.translation(controller.frame(1)).toVector4<glm::vec4>();
         pointable_list[index] = hand.pointables().extended();
+        scale_prob[index] = hand.scaleProbability(controller.frame(5));
+        scale_factor[index] = hand.scaleFactor(controller.frame(5));
 
         if(print_leap_stats)
         {

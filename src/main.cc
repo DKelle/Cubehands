@@ -364,13 +364,21 @@ int main(int argc, char* argv[])
 
         float speed = (glm::length(delta_left_3) + glm::length(delta_right_3))/2;
         bool rotate = speed > .5 && draw_old_left && draw_old_right && draw_right && draw_left && left_fingers == 0 && right_fingers == 0;
-        bool scale = speed > .6 && left_fingers == 5 && right_fingers == 5 && draw_old_left && draw_old_right && draw_left && draw_right;
+        // bool scale = speed > .6 && left_fingers == 5 && right_fingers == 5 && draw_old_left && draw_old_right && draw_left && draw_right;
+        // printf("scaled: %f, %f\n", listener.scale_prob[LEFT], listener.scale_prob[RIGHT]);
+        // bool scale = (draw_left && listener.scale_prob[LEFT] > 0.9) || (draw_right && listener.scale_prob[RIGHT] > 0.9);
+        bool scale = (draw_right && listener.scale_prob[RIGHT] > 0.9);
 
 
         if(draw_left && left_fingers == 0) {
             g_menger->rotate(listener.rotation_matrices[LEFT], cube_faces, cube_vertices, origin);
             cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
             cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+        } else if(scale) {
+            // float temp_speed = (direction < 0) ? 1.1f : .9f;
+            float temp_speed = listener.scale_factor[RIGHT];
+            g_menger->scale(cube_faces, cube_vertices, origin, temp_speed);
+            cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
         }
 
         // use pointable??
@@ -383,18 +391,18 @@ int main(int argc, char* argv[])
             cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
         }
 
-        if(rotate)
-        {
-            float temp_speed = (direction < 0) ? -.1f : .1f;
-            // g_menger->rotate(temp_speed, avg_rot, cube_faces, cube_vertices, glm::vec3(0,15,0));
-            // cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
-            // cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
-        } else if(scale)
-        {
-            float temp_speed = (direction < 0) ? 1.1f : .9f;
-            g_menger->scale(cube_faces, cube_vertices, glm::vec3(0,15,0), temp_speed);
-            cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
-        }
+        // if(draw_left && draw_right && )
+
+        // if(rotate)
+        // {
+        //     float temp_speed = (direction < 0) ? -.1f : .1f;
+        //     // g_menger->rotate(temp_speed, avg_rot, cube_faces, cube_vertices, glm::vec3(0,15,0));
+        //     // cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+        //     // cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+        // } else if(scale)
+        // {
+
+        // }
 
         // Poll and swap.
         glfwPollEvents();

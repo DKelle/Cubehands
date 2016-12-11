@@ -40,6 +40,9 @@ class SampleListener : public Listener {
     std::vector<glm::mat4> rotation_matrices;
     std::vector<glm::vec4> translation_vectors;
     std::vector<Leap::PointableList> pointable_list;
+    std::vector<float> scale_prob;
+    std::vector<float> scale_factor;
+
 
   private:
     std::vector<glm::vec4> hand_positions;
