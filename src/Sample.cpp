@@ -412,11 +412,11 @@ void SampleListener::drawHands(std::vector<glm::vec4>& hand_vertices,
             try {
                 glm::vec4 first_point = bone_vertices.at(first_index);
                 glm::vec4 second_point = bone_vertices.at(second_index);
-                origin = second_point;
 
                 try{
                     first_point = convertLeapToWorld(first_point, SCALE_WIDTH, SCALE_HEIGHT);
                     second_point = convertLeapToWorld(second_point, SCALE_WIDTH, SCALE_HEIGHT);
+                    origin = second_point;
                 } catch(const std::out_of_range& e) {
                     printf("converting to leap %d\n", i);
                     std::cout << e.what() << std::endl;
