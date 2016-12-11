@@ -47,6 +47,8 @@ public:
   void create_cylinder(std::vector<glm::vec4>& cylinder_vertices, std::vector<glm::uvec2>& cylinder_faces, glm::vec4 start, glm::vec4 end);
   void scale(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 origin, float scale_factor);
   void translate(std::vector<glm::uvec3>& obj_faces, std::vector<glm::vec4>& obj_vertices, glm::vec3 translated);
+  void generate_outer_geometry(std::vector<glm::vec4>& line_vertices, std::vector<glm::vec4>& vtx_normals, std::vector<glm::uvec3>& line_faces, glm::vec3 origin, float size) const;
+  void rotate_lines(float speed, glm::vec3 axis, std::vector<glm::uvec3>& line_faces, std::vector<glm::vec4>& line_vertices, glm::vec3 origin); 
 
       // glm::vec3 origin_;
 

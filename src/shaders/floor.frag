@@ -13,7 +13,7 @@ void main() {
 	float i = mod(pos.x, check_width);
 	float j = mod(pos.z, check_width);
 	//vec3 color = mod(i + j, 2) * vec3(1.0, 1.0, 1.0);
-	vec3 color = vec3(0.1,0.1,0.1);
+	vec3 color = vec3(0.2,0.2,0.2);
 	vec3 altColor = vec3(0,0,0);
 
 	if(0 <= i && i <= 0.2) {
