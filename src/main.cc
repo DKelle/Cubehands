@@ -398,49 +398,48 @@ int main(int argc, char* argv[])
 
             if(draw_left) {
                 listener.drawHands(left_joint_vertices, left_joint_faces, left_joint_normals, left_cylinder_vertices, left_cylinder_indices, LEFT);
-
-                //draw cubes at joint on left hands
-                left_joint_pass.setup();
-                left_joint_pass.updateVBO(0, left_joint_vertices.data(), left_joint_vertices.size());
-                CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
-
-                //draw cylinders for fingers on left hands
-                left_cylinder_pass.setup();
-                left_cylinder_pass.updateVBO(0, left_cylinder_vertices.data(), left_cylinder_vertices.size());
-                CHECK_GL_ERROR(glDrawElements(GL_LINES, left_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
-
+            }
+            else
+            {
+                left_cylinder_vertices.clear();
+                left_cylinder_indices.clear();
+                left_joint_vertices.clear();
+                left_joint_faces.clear();
             }
             if(draw_right)
             {
                 listener.drawHands(right_joint_vertices, right_joint_faces, right_joint_normals, right_cylinder_vertices, right_cylinder_indices, RIGHT);
 
-                //draw cubes at joints on right hand
-                right_joint_pass.setup();
-                right_joint_pass.updateVBO(0, right_joint_vertices.data(), right_joint_vertices.size());
-                CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
-
-                //draw cylinders for fingers on left hands
-                right_cylinder_pass.setup();
-                right_cylinder_pass.updateVBO(0, right_cylinder_vertices.data(), right_cylinder_vertices.size());
-                CHECK_GL_ERROR(glDrawElements(GL_LINES, right_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
+            }
+            else
+            {
+                right_cylinder_vertices.clear();
+                right_cylinder_indices.clear();
+                right_joint_vertices.clear();
+                right_joint_faces.clear();
             }
 
-        //calculate the delta hand positions, and the axis of rotation
-        // std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
-        // glm::vec4 old_left = old_hand_pos[0];
-        // glm::vec4 old_right = old_hand_pos[1];
-        // glm::vec4 delta_left = old_left - left;
-        // glm::vec4 delta_right = old_right - right;
-        // glm::vec3 delta_left_3 = glm::vec3(delta_left);
-        // glm::vec3 delta_right_3 = glm::vec3(delta_right);
+            //draw cubes at joint on left hands
+            left_joint_pass.setup();
+            left_joint_pass.updateVBO(0, left_joint_vertices.data(), left_joint_vertices.size());
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
 
-        // float direction = glm::dot(delta_left_3, glm::vec3(0,1,0));
-        // prev_rot = rot;
-        // rot = glm::normalize(glm::cross(delta_right_3, delta_left_3));
-        // glm::vec3 avg_rot = (rot + prev_rot) / 2.0f;
-        // //check that our hands were visible this fram and last frame
-        // bool draw_old_left = old_left.w;
-        // bool draw_old_right = old_right.w;
+            //draw cylinders for fingers on left hands
+            left_cylinder_pass.setup();
+            left_cylinder_pass.updateVBO(0, left_cylinder_vertices.data(), left_cylinder_vertices.size());
+            CHECK_GL_ERROR(glDrawElements(GL_LINES, left_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
+
+    
+            //draw cubes at joints on right hand
+            right_joint_pass.setup();
+            right_joint_pass.updateVBO(0, right_joint_vertices.data(), right_joint_vertices.size());
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
+
+            //draw cylinders for fingers on left hands
+            right_cylinder_pass.setup();
+            right_cylinder_pass.updateVBO(0, right_cylinder_vertices.data(), right_cylinder_vertices.size());
+            CHECK_GL_ERROR(glDrawElements(GL_LINES, right_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
+    
             int left_fingers = listener.digits.at(LEFT);
             int right_fingers = listener.digits.at(RIGHT);
 
@@ -499,9 +498,6 @@ int main(int argc, char* argv[])
                 line_pass.updateVBO(0, line_vertices.data(), line_vertices.size());
                 line_pass_input.assign(1, "normal", line_vtx_normals.data(), line_vtx_normals.size(), 4, GL_FLOAT);
             }
-
-
-
 
             if(gui.reset) {
                 cube_vertices.clear();
