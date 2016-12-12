@@ -529,7 +529,6 @@ int main(int argc, char* argv[])
             if(rotate || scale || translate) {
                 bool selected_1 = left_selected_cube == 1 || right_selected_cube == 1;
                 bool selected_0 = left_selected_cube == 0 || right_selected_cube == 0;
-                bool selected_2 = left_selected_cube == 2 || right_selected_cube == 2;
                
                 if(selected_1 && rIntensity <= 1 && gIntensity <= 0.55f) {
                     rIntensity += 0.01f;
@@ -547,14 +546,6 @@ int main(int argc, char* argv[])
                     bFloorIntensity += 0.0255f;
                     color_floor = glm::vec4(0.0f, gFloorIntensity, bFloorIntensity, 1.0f);
                 }
-                if(selected_2 && rIntensity_r <= 1 && gIntensity_r <= 0.55f) {
-                    rIntensity_r += 0.01f;
-                    gIntensity_r += 0.0055f;
-                    right_colorC = glm::vec4(rIntensity_r, gIntensity_r,0,1);
-                    gFloorIntensity += 0.0255f;
-                    bFloorIntensity += 0.0255f;
-                    color_floor = glm::vec4(0.0f, gFloorIntensity, bFloorIntensity, 1.0f);
-                }
             }
             else {
                 if (rIntensity >= 0 && gIntensity >= 0) {
@@ -567,11 +558,6 @@ int main(int argc, char* argv[])
                     gIntensity_l -= 0.0055f;
                     left_colorC = glm::vec4(rIntensity_l, gIntensity_l,0,1);
                 }
-                if (rIntensity_r >= 0 && gIntensity_r >= 0) {
-                    rIntensity_r -= 0.01f;
-                    gIntensity_r -= 0.0055f;
-                    right_colorC = glm::vec4(rIntensity_r, gIntensity_r,0,1);
-                }
                 if (gFloorIntensity >= 0 && bFloorIntensity >= 0) {
                     gFloorIntensity -= 0.0255f;
 					bFloorIntensity -= 0.0255f;
@@ -580,7 +566,6 @@ int main(int argc, char* argv[])
 
             }
             
-            printf("selected hand is %d \n", left_selected_cube);
             if(rotate) {
                 listener.g_menger->rotate(listener.rotation_matrices.at(LEFT), cube_faces[left_selected_cube], cube_vertices[left_selected_cube], origins[left_selected_cube]);
                 listener.g_menger->rotate(listener.rotation_matrices.at(LEFT), line_faces[left_selected_cube], line_vertices[left_selected_cube], origins[left_selected_cube]);
@@ -665,11 +650,12 @@ int main(int argc, char* argv[])
                     
                     origins[i] = original_origins[i];
                     listener.g_menger->generate_geometry(cube_vertices[i], vtx_normals[i], cube_faces[i], origins[i], SIZE_CUBE);
-                    cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
-                    cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+                    cube_pass.updateVBO(0, cube_vertices[i].data(), cube_vertices[i].size());
+                    cube_pass_input.assign(1, "normal", vtx_normals[i].data(), vtx_normals[i].size(), 4, GL_FLOAT);
                     listener.g_menger->generate_outer_geometry(line_vertices[i], line_vtx_normals[i], line_faces[i], origins[i], SIZE_CUBE);
                     line_pass.updateVBO(0, line_vertices[i].data(), line_vertices[i].size());
                     line_pass_input.assign(1, "normal", line_vtx_normals[i].data(), line_vtx_normals[i].size(), 4, GL_FLOAT);
+
                 }
 
 

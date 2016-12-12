@@ -416,7 +416,6 @@ void SampleListener::drawHands(std::vector<glm::vec4>& joint_vertices, std::vect
             int second_index = bone_indices[index].at(i)[1];
             if(first_index < 0 || second_index < 0 || first_index >= bone_vertices[index].size() 
                     || second_index >= bone_vertices[index].size()) {
-                printf("corrupt indices");
                 joint_vertices.clear();
                 joint_indices.clear();
                 joint_normals.clear();
@@ -455,8 +454,6 @@ void SampleListener::drawHands(std::vector<glm::vec4>& joint_vertices, std::vect
             }
 
             catch (const std::out_of_range& e) {
-                            printf("retrieving the point: %d, %d, size: %lu\n", first_index, second_index, bone_vertices[index].size());
-                            printf("corrupt indices");
                            joint_vertices.clear();
                            joint_indices.clear();
                            joint_normals.clear();
