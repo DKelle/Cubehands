@@ -107,7 +107,6 @@ int main(int argc, char* argv[])
     std::vector<glm::vec4> floor_vertices;
     std::vector<glm::uvec3> floor_faces;
     create_floor(floor_vertices, floor_faces);
-
     // listener.g_menger->fill_origin();
 
     glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
@@ -182,6 +181,7 @@ int main(int argc, char* argv[])
             { floor_model, std_view, std_proj, std_light },
             { "fragment_color" }
             );
+
     float aspect = 0.0f;
 
     //Create the center cube
@@ -353,7 +353,6 @@ int main(int argc, char* argv[])
             floor_pass.setup();
             // Draw our triangles.
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, floor_faces.size() * 3, GL_UNSIGNED_INT, 0));
-
             //also draw the centered cube
             cube_pass.setup();
             glDisable(GL_CULL_FACE);
@@ -409,9 +408,7 @@ int main(int argc, char* argv[])
             right_cylinder_pass.updateVBO(0, right_cylinder_vertices.data(), right_cylinder_vertices.size());
             CHECK_GL_ERROR(glDrawElements(GL_LINES, right_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
         }
-        if(draw_right || draw_left)
-        {
-        }
+
         //calculate the delta hand positions, and the axis of rotation
         // std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
         // glm::vec4 old_left = old_hand_pos[0];

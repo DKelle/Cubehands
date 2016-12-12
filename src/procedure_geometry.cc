@@ -3,12 +3,29 @@
 
 void create_floor(std::vector<glm::vec4>& floor_vertices, std::vector<glm::uvec3>& floor_faces)
 {
-	floor_vertices.push_back(glm::vec4(kFloorXMin, kFloorY, kFloorZMax, 1.0f));
+
+    //create the floor
+    floor_vertices.push_back(glm::vec4(kFloorXMin, kFloorY, kFloorZMax, 1.0f));
 	floor_vertices.push_back(glm::vec4(kFloorXMax, kFloorY, kFloorZMax, 1.0f));
 	floor_vertices.push_back(glm::vec4(kFloorXMax, kFloorY, kFloorZMin, 1.0f));
 	floor_vertices.push_back(glm::vec4(kFloorXMin, kFloorY, kFloorZMin, 1.0f));
 	floor_faces.push_back(glm::uvec3(0, 1, 2));
 	floor_faces.push_back(glm::uvec3(2, 3, 0));
+
+
+    //create the left wall
+    floor_vertices.push_back(glm::vec4(kWallXMax, kFloorY, kWallZMax, 1.0f));
+    floor_vertices.push_back(glm::vec4(kWallXMax, kFloorY+100, kWallZMax, 1.0f));
+    floor_vertices.push_back(glm::vec4(kWallXMax, kFloorY, kWallZMin, 1.0f));
+    floor_vertices.push_back(glm::vec4(kWallXMax, kFloorY+100, kWallZMin, 1.0f));
+    floor_faces.push_back(glm::uvec3(4, 5, 6));
+    floor_faces.push_back(glm::uvec3(6, 7, 4));
+    
+
+    floor_vertices.push_back(glm::vec4(kWallXMin, kFloorY, kWallZMax, 1.0f));
+    floor_vertices.push_back(glm::vec4(kWallXMin, kFloorY, kWallZMin, 1.0f));
+    floor_vertices.push_back(glm::vec4(kWallXMin, kFloorY+100, kWallZMax, 1.0f));
+    floor_vertices.push_back(glm::vec4(kWallXMin, kFloorY+100, kWallZMin, 1.0f));
 }
 
 // FIXME: create cylinders and lines for the bones

@@ -22,4 +22,12 @@ const float kFloorZMin = -100.0f;
 const float kFloorZMax = 100.0f;
 const float kFloorY = -0.75617 - kFloorEps;
 
+//Wall info.
+const float kWallXMin = -100.0f;
+const float kWallXMax = 100.0f;
+const float kWallZMin = -100.0f;
+const float kWallZMax = 100.0f;
+const float kWallYMin = -100.0f;
+const float kWallYMax = 100.0f;
+
 #endif
