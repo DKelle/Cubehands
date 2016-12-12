@@ -415,6 +415,12 @@ int main(int argc, char* argv[])
                 left_cylinder_pass.setup();
                 left_cylinder_pass.updateVBO(0, left_cylinder_vertices.data(), left_cylinder_vertices.size());
                 CHECK_GL_ERROR(glDrawElements(GL_LINES, left_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
+            } else {
+                left_joint_vertices.clear();
+                left_joint_faces.clear();
+                left_cylinder_vertices.clear();
+                left_cylinder_indices.clear();
+                left_joint_pass.updateVBO(0, left_joint_vertices.data(), left_joint_vertices.size());
             }
             if(draw_right)
             {
@@ -429,6 +435,12 @@ int main(int argc, char* argv[])
                 right_cylinder_pass.setup();
                 right_cylinder_pass.updateVBO(0, right_cylinder_vertices.data(), right_cylinder_vertices.size());
                 CHECK_GL_ERROR(glDrawElements(GL_LINES, right_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
+            } else {
+                right_joint_vertices.clear();
+                right_joint_faces.clear();
+                right_cylinder_vertices.clear();
+                right_cylinder_indices.clear();
+                right_joint_pass.updateVBO(0, right_joint_vertices.data(), right_joint_vertices.size());
             }
 
             int left_fingers = listener.digits.at(LEFT);
@@ -517,6 +529,19 @@ int main(int argc, char* argv[])
                 listener.g_menger->generate_outer_geometry(line_vertices, line_vtx_normals, line_faces, origin, SIZE_CUBE);
                 line_pass.updateVBO(0, line_vertices.data(), line_vertices.size());
                 line_pass_input.assign(1, "normal", line_vtx_normals.data(), line_vtx_normals.size(), 4, GL_FLOAT);
+
+                //draw cubes at joint on left hands
+                left_joint_vertices.clear();
+                left_joint_faces.clear();
+                left_cylinder_vertices.clear();
+                left_cylinder_indices.clear();
+                left_joint_pass.updateVBO(0, left_joint_vertices.data(), left_joint_vertices.size());
+
+                right_joint_vertices.clear();
+                right_joint_faces.clear();
+                right_cylinder_vertices.clear();
+                right_cylinder_indices.clear();
+                right_joint_pass.updateVBO(0, right_joint_vertices.data(), right_joint_vertices.size());
 
                 gui.reset = false;
             }
