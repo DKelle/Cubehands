@@ -476,7 +476,7 @@ int main(int argc, char* argv[])
             // use pointable??
             if(translate) {
                 // NEED the order of the multiplication
-                glm::vec3 translation = glm::vec3(listener.translation_vectors.at(RIGHT)) * 0.2f;
+                glm::vec3 translation = glm::vec3(listener.translation_vectors.at(RIGHT)) * 0.5f;
                 origin = translation + origin;
                 listener.g_menger->translate(cube_faces, cube_vertices, translation);
                 cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());

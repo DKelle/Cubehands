@@ -324,7 +324,7 @@ std::vector<glm::vec4> SampleListener::get_old_hand_positions(int width, int hei
 
 glm::vec4 SampleListener::convertLeapToWorld(glm::vec4 vector, int width, int height) {
     glm::vec4 world = glm::vec4(0);
-    world.x = (vector.x / LEAP_MAX) * width;
+    world.x = (vector.x / (LEAP_MAX - 150)) * width;
     world.y = (vector.y / LEAP_MAX) * height;
     world.z = (vector.z / LEAP_MAX) * width - Z_DEPTH;
     world.w = vector.w;

@@ -16,11 +16,11 @@ const float kFov = 45.0f;
 
 // Floor info.
 const float kFloorEps = 0.5 * (0.025 + 0.0175);
-const float kFloorXMin = -100.0f;
-const float kFloorXMax = 100.0f;
-const float kFloorZMin = -100.0f;
-const float kFloorZMax = 100.0f;
-const float kFloorY = -0.75617 - kFloorEps;
+const float kFloorXMin = -500.0f;
+const float kFloorXMax = 500.0f;
+const float kFloorZMin = -500.0f;
+const float kFloorZMax = 500.0f;
+const float kFloorY = -4.5 - kFloorEps;
 
 //Wall info.
 const float kWallXMin = -100.0f;
