@@ -121,6 +121,7 @@ int main(int argc, char* argv[])
     // listener.g_menger->fill_origin();
 
     glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
+
     MatrixPointers mats; // Define MatrixPointers here for lambda to capture
 
 
@@ -210,7 +211,7 @@ int main(int argc, char* argv[])
     std::vector<glm::vec4> cube_vertices;
     std::vector<glm::vec4> vtx_normals;
     std::vector<glm::uvec3> cube_faces;
-    glm::vec3 origin = glm::vec3(0,15,0);
+    glm::vec3 origin = glm::vec3(0,15,-100);
     glm::vec3 original_origin = origin;
     listener.g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, origin, SIZE_CUBE);
 
