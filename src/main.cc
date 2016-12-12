@@ -237,17 +237,15 @@ int main(int argc, char* argv[])
     std::vector<glm::vec3> origins;
     std::vector<glm::vec3> original_origins;
 
-    for(int i = 0; i < 3; i++)
+    for(int i = 0; i < 2; i++)
     {
         cube_vertices.push_back(std::vector<glm::vec4>());
         vtx_normals.push_back(std::vector<glm::vec4>());
         cube_faces.push_back(std::vector<glm::uvec3>());
     }
     origins.push_back(glm::vec3(-30,15,-100));
-    origins.push_back(glm::vec3(0,15,-100));
     origins.push_back(glm::vec3(30,15,-100));
     original_origins.push_back(glm::vec3(-30,15,-100));
-    original_origins.push_back(glm::vec3(0,15,-100));
     original_origins.push_back(glm::vec3(30,15,-100));
 
     //Create the left cube
@@ -271,19 +269,6 @@ int main(int argc, char* argv[])
     cube_pass_input.assign_index(cube_faces[1].data(), cube_faces[1].size(), 3);
     RenderPass cube_pass(-1,
            cube_pass_input,
-           { vertex_shader, geometry_shader, cube_fragment_shader},
-           { std_model, std_view, std_proj, std_light },
-           { "fragment_color" }
-           );
-
-    //Create the right cube
-    listener.g_menger->generate_geometry(cube_vertices[2], vtx_normals[2], cube_faces[2], origins[2], SIZE_CUBE);
-    RenderDataInput right_cube_pass_input;
-    right_cube_pass_input.assign(0, "vertex_position", cube_vertices[2].data(), cube_vertices[2].size(), 4, GL_FLOAT);
-    right_cube_pass_input.assign(1, "normal", vtx_normals[2].data(), vtx_normals[2].size(), 4, GL_FLOAT);
-    right_cube_pass_input.assign_index(cube_faces[2].data(), cube_faces[2].size(), 3);
-    RenderPass right_cube_pass(-1,
-           right_cube_pass_input,
            { vertex_shader, geometry_shader, cube_fragment_shader},
            { std_model, std_view, std_proj, std_light },
            { "fragment_color" }
@@ -374,7 +359,7 @@ int main(int argc, char* argv[])
     std::vector<std::vector<glm::vec4>> line_vertices;
     std::vector<std::vector<glm::vec4>> line_vtx_normals;
     std::vector<std::vector<glm::uvec3>> line_faces;
-    for(int i = 0; i < 3; i++)
+    for(int i = 0; i < 2; i++)
     {
         line_vertices.push_back(std::vector<glm::vec4>());
         line_vtx_normals.push_back(std::vector<glm::vec4>());
@@ -415,17 +400,6 @@ int main(int argc, char* argv[])
             { "fragment_color" }
             );
 
-    RenderDataInput right_line_pass_input;
-    right_line_pass_input.assign(0, "vertex_position", line_vertices[2].data(), line_vertices[2].size(), 4, GL_FLOAT);
-    right_line_pass_input.assign(1, "normal", line_vtx_normals[2].data(), line_vtx_normals[2].size(), 4, GL_FLOAT);
-    right_line_pass_input.assign_index(line_faces[2].data(), line_faces[2].size(), 3);
-    RenderPass right_line_pass(-1,
-            right_line_pass_input,
-            { vertex_shader, geometry_shader, line_fragment_shader},
-            { std_model, std_view, std_proj, std_light, color_r },
-            { "fragment_color" }
-            );
-
     glm::vec3 rot;
     glm::vec3 prev_rot;
     while (!glfwWindowShouldClose(window)) {
@@ -462,19 +436,11 @@ int main(int argc, char* argv[])
             glDisable(GL_CULL_FACE);
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces[1].size() * 3, GL_UNSIGNED_INT, 0));
 
-            //Render the right cube
-            right_cube_pass.setup();
-            glDisable(GL_CULL_FACE);
-            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces[2].size() * 3, GL_UNSIGNED_INT, 0));
-
             line_pass.setup();
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, line_faces[0].size() * 3, GL_UNSIGNED_INT, 0));
 
             left_line_pass.setup();
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, line_faces[1].size() * 3, GL_UNSIGNED_INT, 0));
-
-            right_line_pass.setup();
-            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, line_faces[2].size() * 3, GL_UNSIGNED_INT, 0));
 
         }
 
@@ -544,7 +510,7 @@ int main(int argc, char* argv[])
             int right_selected_cube = -1;
             float left_min_dist = 100000;
             float right_min_dist = 100000;
-            for(int i = 0; i < 3; i ++)
+            for(int i = 0; i < 2; i ++)
             {
                 float left_dist = glm::length(glm::vec2(origins[i]) - glm::vec2(left));
                 float right_dist = glm::length(glm::vec2(origins[i]) - glm::vec2(right));
@@ -633,13 +599,6 @@ int main(int argc, char* argv[])
                     line_pass.updateVBO(0, line_vertices[left_selected_cube].data(), line_vertices[left_selected_cube].size());
                     line_pass_input.assign(1, "normal", line_vtx_normals[left_selected_cube].data(), line_vtx_normals[left_selected_cube].size(), 4, GL_FLOAT);
                 }
-                else
-                {
-                    right_cube_pass.updateVBO(0, cube_vertices[left_selected_cube].data(), cube_vertices[left_selected_cube].size());
-                    right_cube_pass_input.assign(1, "normal", vtx_normals[left_selected_cube].data(), vtx_normals[left_selected_cube].size(), 4, GL_FLOAT);
-                    right_line_pass.updateVBO(0, line_vertices[left_selected_cube].data(), line_vertices[left_selected_cube].size());
-                    right_line_pass_input.assign(1, "normal", line_vtx_normals[left_selected_cube].data(), line_vtx_normals[left_selected_cube].size(), 4, GL_FLOAT);
-                }
 
             } 
 
@@ -666,13 +625,6 @@ int main(int argc, char* argv[])
                     line_pass.updateVBO(0, line_vertices[right_selected_cube].data(), line_vertices[right_selected_cube].size());
                     line_pass_input.assign(1, "normal", line_vtx_normals[right_selected_cube].data(), line_vtx_normals[right_selected_cube].size(), 4, GL_FLOAT);
                 }
-                else
-                {
-                    right_cube_pass.updateVBO(0, cube_vertices[right_selected_cube].data(), cube_vertices[right_selected_cube].size());
-                    right_cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
-                    right_line_pass.updateVBO(0, line_vertices[right_selected_cube].data(), line_vertices[right_selected_cube].size());
-                    right_line_pass_input.assign(1, "normal", line_vtx_normals[right_selected_cube].data(), line_vtx_normals[right_selected_cube].size(), 4, GL_FLOAT);
-                }
 
             }
 
@@ -696,20 +648,12 @@ int main(int argc, char* argv[])
                     line_pass.updateVBO(0, line_vertices[right_selected_cube].data(), line_vertices[right_selected_cube].size());
                     line_pass_input.assign(1, "normal", line_vtx_normals[right_selected_cube].data(), line_vtx_normals[right_selected_cube].size(), 4, GL_FLOAT);
                 }
-                else
-                {
-                    right_cube_pass.updateVBO(0, cube_vertices[right_selected_cube].data(), cube_vertices[right_selected_cube].size());
-                    right_cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
-                    right_line_pass.updateVBO(0, line_vertices[right_selected_cube].data(), line_vertices[right_selected_cube].size());
-                    right_line_pass_input.assign(1, "normal", line_vtx_normals[right_selected_cube].data(), line_vtx_normals[right_selected_cube].size(), 4, GL_FLOAT);
-
-                }
             }
 
             if(gui.reset) {
                 //TODO fix this
 
-                for(int i = 0; i < 3; i ++)
+                for(int i = 0; i < 2; i ++)
                 {
                     cube_vertices[i].clear();
                     vtx_normals[i].clear();
