@@ -134,6 +134,10 @@ int main(int argc, char* argv[])
     glm::vec4 colorC = glm::vec4(rIntensity, gIntensity, 0.0f, 1.0f);
     glm::vec4 left_colorC = glm::vec4(rIntensity_l, gIntensity_l, 0.0f, 1.0f);
     glm::vec4 right_colorC = glm::vec4(rIntensity_r, gIntensity_r, 0.0f, 1.0f);
+	
+	float gFloorIntensity = 0.0;
+	float bFloorIntensity = 0.0;
+    glm::vec4 color_floor = glm::vec4(0.0f, gFloorIntensity, bFloorIntensity, 1.0f);
 
     /*
      * In the following we are going to define several lambda functions to bind Uniforms.
@@ -142,6 +146,8 @@ int main(int argc, char* argv[])
      *      http://en.cppreference.com/w/cpp/language/lambda
      *      http://www.stroustrup.com/C++11FAQ.html#lambda
      */
+		
+	
     auto matrix_binder = [](int loc, const void* data) {
         glUniformMatrix4fv(loc, 1, GL_FALSE, (const GLfloat*)data);
     };
@@ -193,6 +199,9 @@ int main(int argc, char* argv[])
     auto color_data_r = [&right_colorC]() -> const void* {
         return &right_colorC;
     };   
+ 	auto color_data_floor = [&color_floor]() -> const void* {
+			return &color_floor;
+	};   
     float SIZE_CUBE = 5.00f;
 
     //Use these definitions to send matrices to renderpass
@@ -206,6 +215,7 @@ int main(int argc, char* argv[])
     ShaderUniform color = { "colorC", vector_binder, color_data };
     ShaderUniform color_l = { "colorC", vector_binder, color_data_l };
     ShaderUniform color_r = { "colorC", vector_binder, color_data_r };
+	ShaderUniform colorFloor = { "colorC", vector_binder, color_data_floor };
 
     //Create the floor
     RenderDataInput floor_pass_input;
@@ -214,7 +224,7 @@ int main(int argc, char* argv[])
     RenderPass floor_pass(-1,
             floor_pass_input,
             { vertex_shader, geometry_shader, floor_fragment_shader},
-            { floor_model, std_view, std_proj, std_light },
+            { floor_model, std_view, std_proj, std_light, colorFloor  },
             { "fragment_color" }
             );
 
@@ -547,16 +557,25 @@ int main(int argc, char* argv[])
                     rIntensity += 0.01f;
                     gIntensity += 0.0055f;
                     colorC = glm::vec4(rIntensity, gIntensity,0,1);
+                    gFloorIntensity += 0.0255f;
+					bFloorIntensity += 0.0255f;
+					color_floor = glm::vec4(0.0f, gFloorIntensity, bFloorIntensity, 1.0f);
                 }
                 else if(selected_cube == 0 && rIntensity_l <= 1 && gIntensity_l <= 0.55f) {
                     rIntensity_l += 0.01f;
                     gIntensity_l += 0.0055f;
                     left_colorC = glm::vec4(rIntensity_l, gIntensity_l,0,1);
+                    gFloorIntensity += 0.0255f;
+                    bFloorIntensity += 0.0255f;
+                    color_floor = glm::vec4(0.0f, gFloorIntensity, bFloorIntensity, 1.0f);
                 }
                 else if(selected_cube == 2 && rIntensity_r <= 1 && gIntensity_r <= 0.55f) {
                     rIntensity_r += 0.01f;
                     gIntensity_r += 0.0055f;
                     right_colorC = glm::vec4(rIntensity_r, gIntensity_r,0,1);
+                    gFloorIntensity += 0.0255f;
+                    bFloorIntensity += 0.0255f;
+                    color_floor = glm::vec4(0.0f, gFloorIntensity, bFloorIntensity, 1.0f);
                 }
             }
             else {
@@ -575,6 +594,11 @@ int main(int argc, char* argv[])
                     gIntensity_r -= 0.0055f;
                     right_colorC = glm::vec4(rIntensity_r, gIntensity_r,0,1);
                 }
+                if (gFloorIntensity >= 0 && bFloorIntensity >= 0) {
+                    gFloorIntensity -= 0.0255f;
+					bFloorIntensity -= 0.0255f;
+                }
+                color_floor = glm::vec4(0.0f, gFloorIntensity, bFloorIntensity, 1.0f);
 
             }
             

@@ -4,6 +4,7 @@ in vec4 face_normal;
 in vec4 vertex_normal;
 in vec4 light_direction;
 in vec4 world_position;
+uniform vec4 colorC;
 out vec4 fragment_color;
 void main() {
 	vec4 pos = world_position;
@@ -13,8 +14,8 @@ void main() {
 	float i = mod(pos.x, check_width);
 	float j = mod(pos.z, check_width);
 	//vec3 color = mod(i + j, 2) * vec3(1.0, 1.0, 1.0);
-	vec3 color = vec3(0.2,0.2,0.2);
-	vec3 altColor = vec3(0,0,0);
+	vec3 color = vec3(0.1,0.1,0.1);
+	vec3 altColor = vec3(colorC); //vec3(0,0,0);
 
 	if(0 <= i && i <= 0.2) {
 		color = altColor;
