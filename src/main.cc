@@ -58,7 +58,18 @@ const char* hands_fragment_shader =
 #include "shaders/hands.frag"
 ;
 
+
+const char* line_vertex_shader =
+#include "shaders/line.vert"
+;
+
+const char* line_fragment_shader =
+#include "shaders/line.frag"
+;
+
+
 bool reset = false;
+
 // FIXME: Add more shaders here.
 
 void ErrorCallback(int error, const char* description) {
@@ -111,6 +122,12 @@ int main(int argc, char* argv[])
 
     glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
     MatrixPointers mats; // Define MatrixPointers here for lambda to capture
+
+
+    float rIntensity = 0.0;
+    float gIntensity = 0.0;
+    glm::vec4 colorC = glm::vec4(rIntensity, gIntensity, 0.0f, 1.0f);
+
     /*
      * In the following we are going to define several lambda functions to bind Uniforms.
      * 
@@ -160,7 +177,11 @@ int main(int argc, char* argv[])
         else
             return &non_transparet;
     };
+    auto color_data = [&colorC]() -> const void* {
+        return &colorC;
+    };
     
+    float SIZE_CUBE = 5.00f;
 
     //Use these definitions to send matrices to renderpass
     ShaderUniform std_model = { "model", matrix_binder, std_model_data };
@@ -170,6 +191,7 @@ int main(int argc, char* argv[])
     ShaderUniform std_proj = { "projection", matrix_binder, std_proj_data };
     ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
     ShaderUniform object_alpha = { "alpha", float_binder, alpha_data };
+    ShaderUniform color = { "colorC", vector_binder, color_data };
 
     //Create the floor
     RenderDataInput floor_pass_input;
@@ -190,7 +212,7 @@ int main(int argc, char* argv[])
     std::vector<glm::uvec3> cube_faces;
     glm::vec3 origin = glm::vec3(0,15,0);
     glm::vec3 original_origin = origin;
-    listener.g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, origin, 5.00f);
+    listener.g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, origin, SIZE_CUBE);
 
     RenderDataInput cube_pass_input;
     cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
@@ -202,40 +224,6 @@ int main(int argc, char* argv[])
            { std_model, std_view, std_proj, std_light },
            { "fragment_color" }
            );
-
-    // //Create the left hand 
-    // std::vector<glm::vec4> left_vertices;
-    // std::vector<glm::vec4> left_normals;
-    // std::vector<glm::uvec3> left_faces;
-    // listener.g_menger->generate_geometry(left_vertices, left_normals, left_faces, glm::vec3(0.0,15.0,0.0));
-
-    // RenderDataInput left_pass_input;
-    // left_pass_input.assign(0, "vertex_position", left_vertices.data(), left_vertices.size(), 4, GL_FLOAT);
-    // left_pass_input.assign(1, "normal", left_normals.data(), left_normals.size(), 4, GL_FLOAT);
-    // left_pass_input.assign_index(left_faces.data(), left_faces.size(), 3);
-    // RenderPass left_pass(-1,
-    //         left_pass_input,
-    //         { vertex_shader, geometry_shader, cube_fragment_shader},
-    //         { std_model, std_view, std_proj, std_light },
-    //         { "fragment_color" }
-    //         );
-
-    // //Create the right hande
-    // std::vector<glm::vec4> right_vertices;
-    // std::vector<glm::vec4> right_normals;
-    // std::vector<glm::uvec3> right_faces;
-    // listener.g_menger->generate_geometry(right_vertices, right_normals, right_faces, glm::vec3(0.0,15.0,0.0));
-
-    // RenderDataInput right_pass_input;
-    // right_pass_input.assign(0, "vertex_position", right_vertices.data(), right_vertices.size(), 4, GL_FLOAT);
-    // right_pass_input.assign(1, "normal", right_normals.data(), right_normals.size(), 4, GL_FLOAT);
-    // right_pass_input.assign_index(right_faces.data(), right_faces.size(), 3);
-    // RenderPass right_pass(-1,
-    //         right_pass_input,
-    //         { vertex_shader, geometry_shader, cube_fragment_shader},
-    //         { std_model, std_view, std_proj, std_light },
-    //         { "fragment_color" }
-    //         );
 
     bool draw_floor = true;
     bool draw_skeleton = true;
@@ -269,7 +257,6 @@ int main(int argc, char* argv[])
     std::vector<glm::vec4> left_joint_vertices;
     std::vector<glm::vec4> left_joint_normals;
     std::vector<glm::uvec3> left_joint_faces;
-    origin = glm::vec3(0,20,0);
     for(int i = 0; i < 200; i ++)
     {
         listener.g_menger->generate_geometry(right_joint_vertices, right_joint_normals, right_joint_faces, origin, 1.00f);
@@ -319,7 +306,39 @@ int main(int argc, char* argv[])
             { std_model, std_view, std_proj},
             { "fragment_color" }
             );
+
+
+
+    std::vector<glm::vec4> line_vertices;
+    std::vector<glm::vec4> line_vtx_normals;
+    std::vector<glm::uvec3> line_faces;
+    listener.g_menger->generate_outer_geometry(line_vertices, line_vtx_normals, line_faces, origin, SIZE_CUBE);
+
+
+    
     //listener.g_menger->create_cylinder(cylinder_vertices, cylinder_indices, glm::vec4(0,0,0,1), glm::vec4(0,1,0,1));
+
+
+    
+
+    // rIntensity += 0.01f;
+    // gIntensity += 0.0055f;
+    // intensity -= 0.01f;
+
+    RenderDataInput line_pass_input;
+    line_pass_input.assign(0, "vertex_position", line_vertices.data(), line_vertices.size(), 4, GL_FLOAT);
+    line_pass_input.assign(1, "normal", line_vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+    line_pass_input.assign_index(line_faces.data(), line_faces.size(), 3);
+    RenderPass line_pass(-1,
+            line_pass_input,
+            { vertex_shader, geometry_shader, line_fragment_shader},
+            { std_model, std_view, std_proj, std_light, color },
+            { "fragment_color" }
+            );
+
+
+    
+
 
     glm::vec3 rot;
     glm::vec3 prev_rot;
@@ -342,6 +361,10 @@ int main(int argc, char* argv[])
 
         int current_bone = gui.getCurrentBone();
 
+
+	
+
+
 #if 1
         draw_cylinder = (current_bone != -1 && gui.isTransparent());
 #else
@@ -358,16 +381,9 @@ int main(int argc, char* argv[])
             glDisable(GL_CULL_FACE);
             CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, cube_faces.size() * 3, GL_UNSIGNED_INT, 0));
 
+            line_pass.setup();
+            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, line_faces.size() * 3, GL_UNSIGNED_INT, 0));
         }
-
-        // if(listener.reset) {
-        //     cube_vertices.clear();
-        //     vtx_normals.clear();
-        //     cube_faces.clear();
-        //     origin = original_origin;
-        //     listener.g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, original_origin, 5.00f);
-        //     listener.reset = false;
-        // }
 
 
         
@@ -380,34 +396,34 @@ int main(int argc, char* argv[])
 
         try {
 
-        if(draw_left) {
-            listener.drawHands(left_joint_vertices, left_joint_faces, left_joint_normals, left_cylinder_vertices, left_cylinder_indices, LEFT);
+            if(draw_left) {
+                listener.drawHands(left_joint_vertices, left_joint_faces, left_joint_normals, left_cylinder_vertices, left_cylinder_indices, LEFT);
 
-            //draw cubes at joint on left hands
-            left_joint_pass.setup();
-            left_joint_pass.updateVBO(0, left_joint_vertices.data(), left_joint_vertices.size());
-            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
+                //draw cubes at joint on left hands
+                left_joint_pass.setup();
+                left_joint_pass.updateVBO(0, left_joint_vertices.data(), left_joint_vertices.size());
+                CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, left_joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
 
-            //draw cylinders for fingers on left hands
-            left_cylinder_pass.setup();
-            left_cylinder_pass.updateVBO(0, left_cylinder_vertices.data(), left_cylinder_vertices.size());
-            CHECK_GL_ERROR(glDrawElements(GL_LINES, left_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
+                //draw cylinders for fingers on left hands
+                left_cylinder_pass.setup();
+                left_cylinder_pass.updateVBO(0, left_cylinder_vertices.data(), left_cylinder_vertices.size());
+                CHECK_GL_ERROR(glDrawElements(GL_LINES, left_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
 
-        }
-        if(draw_right)
-        {
-            listener.drawHands(right_joint_vertices, right_joint_faces, right_joint_normals, right_cylinder_vertices, right_cylinder_indices, RIGHT);
+            }
+            if(draw_right)
+            {
+                listener.drawHands(right_joint_vertices, right_joint_faces, right_joint_normals, right_cylinder_vertices, right_cylinder_indices, RIGHT);
 
-            //draw cubes at joints on right hand
-            right_joint_pass.setup();
-            right_joint_pass.updateVBO(0, right_joint_vertices.data(), right_joint_vertices.size());
-            CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
+                //draw cubes at joints on right hand
+                right_joint_pass.setup();
+                right_joint_pass.updateVBO(0, right_joint_vertices.data(), right_joint_vertices.size());
+                CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES, right_joint_faces.size() * 3, GL_UNSIGNED_INT, 0));
 
-            //draw cylinders for fingers on left hands
-            right_cylinder_pass.setup();
-            right_cylinder_pass.updateVBO(0, right_cylinder_vertices.data(), right_cylinder_vertices.size());
-            CHECK_GL_ERROR(glDrawElements(GL_LINES, right_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
-        }
+                //draw cylinders for fingers on left hands
+                right_cylinder_pass.setup();
+                right_cylinder_pass.updateVBO(0, right_cylinder_vertices.data(), right_cylinder_vertices.size());
+                CHECK_GL_ERROR(glDrawElements(GL_LINES, right_cylinder_indices.size()*2, GL_UNSIGNED_INT, 0));
+            }
 
         //calculate the delta hand positions, and the axis of rotation
         // std::vector<glm::vec4> old_hand_pos = listener.get_old_hand_positions(100, 100);
@@ -425,68 +441,85 @@ int main(int argc, char* argv[])
         // //check that our hands were visible this fram and last frame
         // bool draw_old_left = old_left.w;
         // bool draw_old_right = old_right.w;
-
             int left_fingers = listener.digits.at(LEFT);
             int right_fingers = listener.digits.at(RIGHT);
 
-            // float speed = (glm::length(delta_left_3) + glm::length(delta_right_3))/2;
-            // bool rotate = speed > .5 && draw_old_left && draw_old_right && draw_right && draw_left && left_fingers == 0 && right_fingers == 0;
-            // bool scale = speed > .6 && left_fingers == 5 && right_fingers == 5 && draw_old_left && draw_old_right && draw_left && draw_right;
-            // printf("scaled: %f, %f\n", listener.scale_prob[LEFT], listener.scale_prob[RIGHT]);
-            // bool scale = (draw_left && listener.scale_prob[LEFT] > 0.9) || (draw_right && listener.scale_prob[RIGHT] > 0.9);
-            // bool scale = (draw_right && listener.scale_prob.at(RIGHT) > 0.9);
             bool scale = (draw_left && left_fingers == 5) && (draw_right && listener.scale_prob.at(RIGHT) > 0.9);
+            bool translate = draw_right && listener.pointable_list.at(RIGHT).count() == 1;
+            bool rotate = (draw_left && left_fingers == 0);
+            if(rotate || scale || translate) {
+                if(rIntensity <= 1 && gIntensity <= 0.55f) {
+                    rIntensity += 0.01f;
+                    gIntensity += 0.0055f;
+                    colorC = glm::vec4(rIntensity, gIntensity,0,1);
+                }
+            }
+            else {
+                if (rIntensity >= 0 && gIntensity >= 0) {
+                    rIntensity -= 0.01f;
+                    gIntensity -= 0.0055f;
+                }
+                colorC = glm::vec4(rIntensity, gIntensity,0,1);
+            }
 
-
-            if(draw_left && left_fingers == 0) {
+            if(rotate) {
                 listener.g_menger->rotate(listener.rotation_matrices.at(LEFT), cube_faces, cube_vertices, origin);
                 cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
                 cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+
+                listener.g_menger->rotate(listener.rotation_matrices.at(LEFT), line_faces, line_vertices, origin);
+                line_pass.updateVBO(0, line_vertices.data(), line_vertices.size());
+                line_pass_input.assign(1, "normal", line_vtx_normals.data(), line_vtx_normals.size(), 4, GL_FLOAT);
             } 
-            // else if(scale) {
-            //     // float temp_speed = (direction < 0) ? 1.1f : .9f;
-            //     float temp_speed = listener.scale_factor[RIGHT];
-            //     g_menger->scale(cube_faces, cube_vertices, origin, temp_speed);
-            //     cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
-            // }
+
 
             // use pointable??
-            if(draw_right && listener.pointable_list.at(RIGHT).count() == 1) {
+            if(translate) {
                 // NEED the order of the multiplication
-                glm::vec3 translation = glm::vec3(listener.translation_vectors.at(RIGHT)) * 0.1f;
+                glm::vec3 translation = glm::vec3(listener.translation_vectors.at(RIGHT)) * 0.2f;
                 origin = translation + origin;
                 listener.g_menger->translate(cube_faces, cube_vertices, translation);
                 cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
                 cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+
+                listener.g_menger->translate(line_faces, line_vertices, translation);
+                line_pass.updateVBO(0, line_vertices.data(), line_vertices.size());
+                line_pass_input.assign(1, "normal", line_vtx_normals.data(), line_vtx_normals.size(), 4, GL_FLOAT);
             }
-
-            // if(draw_left && draw_right && )
-
-            // if(rotate)
-            // {
-            //     float temp_speed = (direction < 0) ? -.1f : .1f;
-            //     // g_menger->rotate(temp_speed, avg_rot, cube_faces, cube_vertices, glm::vec3(0,15,0));
-            //     // cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
-            //     // cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
-            // } else if(scale)
-            // {
 
             if(scale) {
                 // float temp_speed = (direction < 0) ? 1.1f : .9f;
                 float temp_speed = listener.scale_factor.at(RIGHT);
                 listener.g_menger->scale(cube_faces, cube_vertices, origin, temp_speed);
                 cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
+                cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+
+
+                listener.g_menger->scale(line_faces, line_vertices, origin, temp_speed);
+                line_pass.updateVBO(0, line_vertices.data(), line_vertices.size());
+                line_pass_input.assign(1, "normal", line_vtx_normals.data(), line_vtx_normals.size(), 4, GL_FLOAT);
             }
-        // }
+
+
+
 
             if(gui.reset) {
                 cube_vertices.clear();
                 vtx_normals.clear();
                 cube_faces.clear();
+
+                line_vertices.clear();
+                line_vtx_normals.clear();
+                line_faces.clear();
                 origin = original_origin;
-                listener.g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, original_origin, 5.00f);
+                listener.g_menger->generate_geometry(cube_vertices, vtx_normals, cube_faces, origin, SIZE_CUBE);
                 cube_pass.updateVBO(0, cube_vertices.data(), cube_vertices.size());
                 cube_pass_input.assign(1, "normal", vtx_normals.data(), vtx_normals.size(), 4, GL_FLOAT);
+
+                listener.g_menger->generate_outer_geometry(line_vertices, line_vtx_normals, line_faces, origin, SIZE_CUBE);
+                line_pass.updateVBO(0, line_vertices.data(), line_vertices.size());
+                line_pass_input.assign(1, "normal", line_vtx_normals.data(), line_vtx_normals.size(), 4, GL_FLOAT);
+
                 gui.reset = false;
             }
 
@@ -501,6 +534,7 @@ int main(int argc, char* argv[])
     }
     glfwDestroyWindow(window);
     glfwTerminate();
+
 #if 0
     for (size_t i = 0; i < images.size(); ++i)
         delete [] images[i].bytes;
